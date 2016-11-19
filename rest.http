@@ -9,7 +9,7 @@
 GET http://127.0.0.1:5000
 
 # Save bookmark
-POST http://127.0.0.1:5000/api/bookmarks
+POST http://127.0.0.1:5000/api/v1/bookmarks
 Content-Type: application/json
 
 {
@@ -19,7 +19,7 @@ Content-Type: application/json
 }
 
 # Save bookmark (no timestamp)
-POST http://127.0.0.1:5000/api/bookmarks
+POST http://127.0.0.1:5000/api/v1/bookmarks
 Content-Type: application/json
 
 {

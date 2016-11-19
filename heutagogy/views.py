@@ -13,7 +13,7 @@ conn.commit()
 def index():
     return 'Hello, world!'
 
-@app.route('/api/bookmarks', methods=['POST'])
+@app.route('/api/v1/bookmarks', methods=['POST'])
 def bookmark_post():
     r = request.get_json()
 
