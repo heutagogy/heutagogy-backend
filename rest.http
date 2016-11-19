@@ -1,0 +1,28 @@
+# -*- restclient -*-
+#
+# This file contains example requests.
+# It can be used directly with Emacs restclient plugin.
+# See https://github.com/pashky/restclient.el
+#
+
+# Hello, world!
+GET http://127.0.0.1:5000
+
+# Save bookmark
+POST http://127.0.0.1:5000/api/bookmarks
+Content-Type: application/json
+
+{
+  "url": "http://github.com/heutagogy/heutagogy-backend",
+  "title": "heutagogy/heutagogy-backend",
+  "timestamp": "2016-11-19 01:31:15"
+}
+
+# Save bookmark (no timestamp)
+POST http://127.0.0.1:5000/api/bookmarks
+Content-Type: application/json
+
+{
+  "url": "http://github.com/heutagogy/heutagogy-backend",
+  "title": "heutagogy-backend"
+}
