@@ -8,6 +8,9 @@
 # Hello, world!
 GET http://127.0.0.1:5000
 
+# Get all saved bookmarks
+GET http://127.0.0.1:5000/api/v1/bookmarks
+
 # Save bookmark
 POST http://127.0.0.1:5000/api/v1/bookmarks
 Content-Type: application/json
