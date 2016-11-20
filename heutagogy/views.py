@@ -1,6 +1,7 @@
 from heutagogy import app
 from flask import request, jsonify
 import sqlite3
+import datetime
 
 conn = sqlite3.connect('heutagogy.sqlite3')
 c = conn.cursor()
@@ -20,13 +21,25 @@ def bookmark_post():
     try:
         url = r['url']
         title = r['title']
-        timestamp = r['timestamp']
     except:
         return jsonify(message='Request error'), 400
+
+    if 'timestamp' in r:
+        timestamp = r['timestamp']
+    else:
+        timestamp = datetime.datetime.utcnow().isoformat(' ')
 
     conn = sqlite3.connect('heutagogy.sqlite3')
     c = conn.cursor()
     c.execute('INSERT INTO bookmarks VALUES (?, ?, ?)', (timestamp, url, title))
+    bookmark_id = c.lastrowid
     conn.commit()
 
-    return '', 201
+    bookmark = {
+        'id': bookmark_id,
+        'url': url,
+        'title': title,
+        'timestamp': timestamp,
+    }
+
+    return jsonify(**bookmark), 201
