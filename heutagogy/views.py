@@ -19,14 +19,11 @@ def bookmarks_post():
     bookmark = dict()
     try:
         bookmark['url'] = r['url']
-        bookmark['title'] = r['title']
     except:
-        return jsonify(message='Request error'), 400
+        return jsonify(message='url field is mandatory'), 400
 
-    if 'timestamp' in r:
-        bookmark['timestamp'] = r['timestamp']
-    else:
-        bookmark['timestamp'] = datetime.datetime.utcnow().isoformat(' ')
+    bookmark['title'] = r['title'] if 'title' in r else bookmark['url']
+    bookmark['timestamp'] = r['timestamp'] if 'timestamp' in r else datetime.datetime.utcnow().isoformat(' ')
 
     result = heutagogy.persistence.save_bookmark(bookmark)
     return jsonify(**result), 201
