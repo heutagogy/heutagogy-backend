@@ -27,6 +27,14 @@ def bookmark_post():
     conn = sqlite3.connect('heutagogy.sqlite3')
     c = conn.cursor()
     c.execute('INSERT INTO bookmarks VALUES (?, ?, ?)', (timestamp, url, title))
+    bookmark_id = c.lastrowid
     conn.commit()
 
-    return '', 201
+    bookmark = {
+        'id': bookmark_id,
+        'url': url,
+        'title': title,
+        'timestamp': timestamp,
+    }
+
+    return jsonify(**bookmark), 201
