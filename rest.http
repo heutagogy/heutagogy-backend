@@ -5,11 +5,16 @@
 # See https://github.com/pashky/restclient.el
 #
 
+:host = http://127.0.0.1:5000
+
 # Hello, world!
-GET http://127.0.0.1:5000
+GET :host/
+
+# Get all saved bookmarks
+GET :host/api/v1/bookmarks
 
 # Save bookmark
-POST http://127.0.0.1:5000/api/v1/bookmarks
+POST :host/api/v1/bookmarks
 Content-Type: application/json
 
 {
@@ -19,10 +24,20 @@ Content-Type: application/json
 }
 
 # Save bookmark (no timestamp)
-POST http://127.0.0.1:5000/api/v1/bookmarks
+# This will use current time
+POST :host/api/v1/bookmarks
 Content-Type: application/json
 
 {
   "url": "http://github.com/heutagogy/heutagogy-backend",
   "title": "heutagogy-backend"
+}
+
+# Save bookmark (no title)
+# This will use url as a title
+POST :host/api/v1/bookmarks
+Content-Type: application/json
+
+{
+  "url": "https://github.com/heutagogy"
 }

@@ -1,32 +1,34 @@
 from heutagogy import app
-from flask import request, jsonify
+import heutagogy.persistence
+
+from flask import request, jsonify, Response
+import json
+import datetime
 import sqlite3
 
-conn = sqlite3.connect('heutagogy.sqlite3')
-c = conn.cursor()
-
-c.execute('''CREATE TABLE IF NOT EXISTS bookmarks
-             (date text, url text, title text)''')
-conn.commit()
+heutagogy.persistence.initialize()
 
 @app.route('/')
 def index():
     return 'Hello, world!'
 
 @app.route('/api/v1/bookmarks', methods=['POST'])
-def bookmark_post():
+def bookmarks_post():
     r = request.get_json()
 
+    bookmark = dict()
     try:
-        url = r['url']
-        title = r['title']
-        timestamp = r['timestamp']
+        bookmark['url'] = r['url']
     except:
-        return jsonify(message='Request error'), 400
+        return jsonify(message='url field is mandatory'), 400
 
-    conn = sqlite3.connect('heutagogy.sqlite3')
-    c = conn.cursor()
-    c.execute('INSERT INTO bookmarks VALUES (?, ?, ?)', (timestamp, url, title))
-    conn.commit()
+    bookmark['title'] = r['title'] if 'title' in r else bookmark['url']
+    bookmark['timestamp'] = r['timestamp'] if 'timestamp' in r else datetime.datetime.utcnow().isoformat(' ')
 
-    return '', 201
+    result = heutagogy.persistence.save_bookmark(bookmark)
+    return jsonify(**result), 201
+
+@app.route('/api/v1/bookmarks', methods=['GET'])
+def bookmarks_get():
+    result = heutagogy.persistence.get_bookmarks()
+    return Response(json.dumps(result), mimetype='application/json')
