@@ -14,7 +14,7 @@ def index():
 
 @app.route('/api/v1/bookmarks', methods=['POST'])
 def bookmarks_post():
-    r = request.get_json()
+    r = request.get_json(force=True)
 
     bookmark = dict()
     try:
