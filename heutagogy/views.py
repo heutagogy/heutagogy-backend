@@ -6,8 +6,6 @@ import json
 import datetime
 import sqlite3
 
-heutagogy.persistence.initialize()
-
 @app.route('/')
 def index():
     return 'Hello, world!'
