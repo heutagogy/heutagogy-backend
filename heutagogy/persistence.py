@@ -1,18 +1,30 @@
+from heutagogy import app
+from flask import g
 import sqlite3
 
+def connect_db():
+    return sqlite3.connect(app.config['DATABASE'])
+
+def get_db():
+    if not hasattr(g, 'db'):
+        g.db = connect_db()
+    return g.db
+
+@app.teardown_appcontext
+def close_db(error):
+    if hasattr(g, 'db'):
+        g.db.close()
+
 def with_connection(f):
-    conn = sqlite3.connect('heutagogy.sqlite3')
+    conn = get_db()
     result = f(conn)
     conn.commit()
-    conn.close()
     return result
 
 def initialize():
-    def init_fn(conn):
-        c = conn.cursor()
-        c.execute('''
-            CREATE TABLE IF NOT EXISTS bookmarks
-            (timestamp text, url text, title text)''')
+    def init_fn(db):
+        with app.open_resource('schema.sql', mode='r') as f:
+            db.cursor().executescript(f.read())
     with_connection(init_fn)
 
 def save_bookmark(bookmark):
