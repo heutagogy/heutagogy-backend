@@ -2,6 +2,7 @@ from heutagogy import app
 import heutagogy.persistence
 
 from flask import request, jsonify, Response
+import flask_login
 import json
 import datetime
 import sqlite3
@@ -11,6 +12,7 @@ def index():
     return 'Hello, world!'
 
 @app.route('/api/v1/bookmarks', methods=['POST'])
+@flask_login.login_required
 def bookmarks_post():
     r = request.get_json(force=True)
 
@@ -27,6 +29,7 @@ def bookmarks_post():
     return jsonify(**result), 201
 
 @app.route('/api/v1/bookmarks', methods=['GET'])
+@flask_login.login_required
 def bookmarks_get():
     result = heutagogy.persistence.get_bookmarks()
     return Response(json.dumps(result), mimetype='application/json')
