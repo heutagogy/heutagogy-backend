@@ -4,6 +4,8 @@ import os
 
 app.config.from_object(__name__)
 app.config.update(dict(
+    BASIC_AUTH_USERNAME='myuser',
+    BASIC_AUTH_PASSWORD='mypassword',
     DATABASE=os.path.join(app.root_path, 'heutagogy.sqlite3'),
     DEBUG=True))
 app.config.from_envvar('HEUTAGOGY_SETTINGS', silent=True)

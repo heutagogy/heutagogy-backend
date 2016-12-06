@@ -5,16 +5,29 @@
 # See https://github.com/pashky/restclient.el
 #
 
-:host = http://127.0.0.1:5000
+:host = 127.0.0.1:5000
+:auth = myuser:mypassword
+
+:url = http://:auth@:host
+:unauthorized = :url
 
 # Hello, world!
-GET :host/
+GET :unauthorized/
 
-# Get all saved bookmarks
-GET :host/api/v1/bookmarks
+# Hello world with auth
+GET :url/
+
+# Get all saved bookmarks (unauthorized)
+GET :unauthorized/api/v1/bookmarks
+
+# Get all saved bookmarks (authorized)
+GET :url/api/v1/bookmarks
+
+# Get all saved bookmarks (bad credentials)
+GET http://badname:badpass@:host/api/v1/bookmarks
 
 # Save bookmark
-POST :host/api/v1/bookmarks
+POST :url/api/v1/bookmarks
 Content-Type: application/json
 
 {
@@ -25,7 +38,7 @@ Content-Type: application/json
 
 # Save bookmark (no timestamp)
 # This will use current time
-POST :host/api/v1/bookmarks
+POST :url/api/v1/bookmarks
 Content-Type: application/json
 
 {
@@ -35,7 +48,7 @@ Content-Type: application/json
 
 # Save bookmark (no title)
 # This will use url as a title
-POST :host/api/v1/bookmarks
+POST :url/api/v1/bookmarks
 Content-Type: application/json
 
 {
