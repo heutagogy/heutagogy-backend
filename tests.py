@@ -75,7 +75,91 @@ class HeutagogyTestCase(unittest.TestCase):
         result = json.loads(res.get_data().decode('utf-8'))
 
         self.assertEqual(200, res.status_code)
-        self.assertEqual([dict(bookmark, id=1)], result)
+        self.assertEqual([dict(bookmark, id=1, read=False)], result)
+
+    def test_new_bookmark_post_is_unread(self):
+        bookmark = {
+            'url': 'https://github.com/',
+        }
+        res = self.app.post(
+            '/api/v1/bookmarks',
+            content_type='application/json',
+            data=json.dumps(bookmark),
+            headers=[('Authorization', self.authorization)])
+        result = json.loads(res.get_data().decode('utf-8'))
+
+        self.assertEqual(201, res.status_code)
+        self.assertEqual(False, result['read'])
+
+    def test_new_bookmark_read_is_unread(self):
+        bookmark = {
+            'url': 'https://github.com/',
+        }
+        res = self.app.post(
+            '/api/v1/bookmarks',
+            content_type='application/json',
+            data=json.dumps(bookmark),
+            headers=[('Authorization', self.authorization)])
+
+        bookmark_id = json.loads(res.get_data().decode('utf-8'))['id']
+
+        res = self.app.get(
+            '/api/v1/bookmark/{}'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps({'read': True}),
+            headers=[('Authorization', self.authorization)])
+        result = json.loads(res.get_data().decode('utf-8'))
+
+        self.assertEqual(200, res.status_code)
+        self.assertEqual(False, result['read'])
+
+    def test_mark_as_read(self):
+        bookmark = {
+            'url': 'https://github.com/',
+        }
+        res = self.app.post(
+            '/api/v1/bookmarks',
+            content_type='application/json',
+            data=json.dumps(bookmark),
+            headers=[('Authorization', self.authorization)])
+        result = json.loads(res.get_data().decode('utf-8'))
+
+        bookmark_id = result['id']
+
+        res = self.app.put(
+            '/api/v1/bookmark/{}/read'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps({'read': True}),
+            headers=[('Authorization', self.authorization)])
+
+        self.assertEqual(200, res.status_code)
+        result = json.loads(res.get_data().decode('utf-8'))
+        self.assertEqual(True, result['read'])
+
+    def test_mark_as_read_updates_read(self):
+        bookmark = {
+            'url': 'https://github.com/',
+        }
+        res = self.app.post(
+            '/api/v1/bookmarks',
+            content_type='application/json',
+            data=json.dumps(bookmark),
+            headers=[('Authorization', self.authorization)])
+        bookmark_id = json.loads(res.get_data().decode('utf-8'))['id']
+
+        res = self.app.put(
+            '/api/v1/bookmark/{}/read'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps({'read': True}),
+            headers=[('Authorization', self.authorization)])
+
+        res = self.app.get(
+            '/api/v1/bookmark/{}'.format(bookmark_id),
+            headers=[('Authorization', self.authorization)])
+
+        self.assertEqual(200, res.status_code)
+        result = json.loads(res.get_data().decode('utf-8'))
+        self.assertEqual(True, result['read'])
 
 if __name__ == '__main__':
     unittest.main()
