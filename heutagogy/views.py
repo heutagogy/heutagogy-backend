@@ -20,10 +20,11 @@ def bookmarks_post():
     try:
         bookmark['url'] = r['url']
     except:
-        return jsonify(message='url field is mandatory'), 400
+        return jsonify(error='url field is mandatory'), 400
 
     bookmark['title'] = r['title'] if 'title' in r else bookmark['url']
     bookmark['timestamp'] = r['timestamp'] if 'timestamp' in r else datetime.datetime.utcnow().isoformat(' ')
+    bookmark['read'] = r.get('read', False)
 
     result = heutagogy.persistence.save_bookmark(bookmark)
     return jsonify(**result), 201
@@ -33,3 +34,16 @@ def bookmarks_post():
 def bookmarks_get():
     result = heutagogy.persistence.get_bookmarks()
     return Response(json.dumps(result), mimetype='application/json')
+
+@app.route('/api/v1/bookmark/<int:id>/read', methods=['PUT'])
+@flask_login.login_required
+def bookmark_read_put(id):
+    read = request.get_json()['read']
+    result = heutagogy.persistence.set_read(id, read)
+    return jsonify(**result)
+
+@app.route('/api/v1/bookmark/<int:id>', methods=['GET'])
+@flask_login.login_required
+def bookmark_get(id):
+    bookmark = heutagogy.persistence.get_bookmark(id)
+    return jsonify(**bookmark)
