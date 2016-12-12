@@ -27,14 +27,14 @@ def initialize():
             db.cursor().executescript(f.read())
     with_connection(init_fn)
 
-def save_bookmark(bookmark):
+def save_bookmark(user_id, bookmark):
     def save_fn(conn):
         c = conn.cursor()
         c.execute('''
-            INSERT INTO bookmarks(timestamp, url, title, read)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO bookmarks(user, timestamp, url, title, read)
+            VALUES (?, ?, ?, ?, ?)
             ''',
-            (bookmark['timestamp'], bookmark['url'], bookmark['title'], bookmark['read']))
+            (user_id, bookmark['timestamp'], bookmark['url'], bookmark['title'], bookmark['read']))
         return dict(bookmark, id=c.lastrowid)
     return with_connection(save_fn)
 
@@ -47,24 +47,34 @@ def row_to_bookmark(r):
         'read': r[4],
     }
 
-def get_bookmarks():
-    def get_fn(conn):
-        c = conn.cursor()
-        c.execute('SELECT rowid, timestamp, url, title, read FROM bookmarks')
-        return list(map(row_to_bookmark, c.fetchall()))
-    return with_connection(get_fn)
-
-def get_bookmark(bookmark_id):
+def get_bookmarks(user_id):
     def get_fn(conn):
         c = conn.cursor()
         c.execute(
             '''
             SELECT rowid, timestamp, url, title, read
             FROM bookmarks
-            WHERE rowid = ?
+            WHERE user = ?
             ''',
-            (bookmark_id, ))
-        return list(map(row_to_bookmark, c.fetchall()))[0]
+            (user_id,))
+        return list(map(row_to_bookmark, c.fetchall()))
+    return with_connection(get_fn)
+
+def get_bookmark(user_id, bookmark_id):
+    def get_fn(conn):
+        c = conn.cursor()
+        c.execute(
+            '''
+            SELECT rowid, timestamp, url, title, read
+            FROM bookmarks
+            WHERE rowid = ? AND user = ?
+            ''',
+            (bookmark_id, user_id))
+        result = list(map(row_to_bookmark, c.fetchall()))
+        if len(result) == 0:
+            return None
+        else:
+            return result[0]
     return with_connection(get_fn)
 
 def set_read(bookmark_id, read):
