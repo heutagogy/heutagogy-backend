@@ -44,7 +44,7 @@ class HeutagogyTestCase(unittest.TestCase):
         result = json.loads(res.get_data().decode('utf-8'))
 
         self.assertEqual(401, res.status_code)
-        self.assertDictEqual({'message': 'Unauthorized'}, result)
+        self.assertDictEqual({'error': 'Unauthorized'}, result)
 
     def test_get_bookmark_requires_authorization(self):
         res = self.app.get('/api/v1/bookmarks')
@@ -160,6 +160,19 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(200, res.status_code)
         result = json.loads(res.get_data().decode('utf-8'))
         self.assertEqual(True, result['read'])
+
+    def test_wrong_pass(self):
+        res = self.app.get(
+            '/api/v1/bookmarks',
+            headers=[('Authorization', 'Basic ' + base64.b64encode(b'myuser:wrongpass').decode('utf-8'))])
+        self.assertEqual(401, res.status_code)
+        self.assertEqual({'error': 'Unauthorized'}, json.loads(res.get_data().decode('utf-8')))
+
+    def test_second_user_auth(self):
+        res = self.app.get(
+            '/api/v1/bookmarks',
+            headers=[('Authorization', 'Basic ' + base64.b64encode(b'user2:pass2').decode('utf-8'))])
+        self.assertEqual(200, res.status_code)
 
 if __name__ == '__main__':
     unittest.main()

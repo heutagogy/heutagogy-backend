@@ -10,18 +10,18 @@ class User(flask_login.UserMixin):
 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
-    return jsonify(message='Unauthorized'), 401
+    return jsonify(error='Unauthorized'), 401
 
 @login_manager.request_loader
 def request_loader(request):
     if not request.authorization:
         return None
 
+    users = app.config['USERS']
     username = request.authorization.username
     password = request.authorization.password
 
-    if username == app.config['BASIC_AUTH_USERNAME'] and \
-       password == app.config['BASIC_AUTH_PASSWORD']:
+    if username in users and password == users[username]['password']:
         user = User()
         user.id = username
         return user
