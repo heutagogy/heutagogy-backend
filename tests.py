@@ -139,8 +139,8 @@ class HeutagogyTestCase(unittest.TestCase):
 
         bookmark_id = result['id']
 
-        res = self.app.put(
-            '/api/v1/bookmark/{}/read'.format(bookmark_id),
+        res = self.app.post(
+            '/api/v1/bookmark/{}'.format(bookmark_id),
             content_type='application/json',
             data=json.dumps({'read': True}),
             headers=[self.user1])
@@ -160,8 +160,8 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user1])
         bookmark_id = json.loads(res.get_data().decode())['id']
 
-        res = self.app.put(
-            '/api/v1/bookmark/{}/read'.format(bookmark_id),
+        res = self.app.post(
+            '/api/v1/bookmark/{}'.format(bookmark_id),
             content_type='application/json',
             data=json.dumps({'read': True}),
             headers=[self.user1])
@@ -225,17 +225,30 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(201, res.status_code)
         bookmark_id = json.loads(res.get_data().decode())['id']
 
-        res = self.app.put(
-            '/api/v1/bookmark/{}/read'.format(bookmark_id),
+        res = self.app.post(
+            '/api/v1/bookmark/{}'.format(bookmark_id),
             content_type='application/json',
             data=json.dumps({'read': True}),
             headers=[self.user2])
         self.assertEqual(404, res.status_code)
+        self.assertEqual({'error': 'Not found'}, json.loads(res.get_data().decode()))
 
         res = self.app.get(
             '/api/v1/bookmark/{}'.format(bookmark_id),
             headers=[self.user1])
         self.assertEqual(False, json.loads(res.get_data().decode())['read'])
+
+    def test_new_bookmark_requires_url(self):
+        bookmark = {
+            'title': 'no url',
+        }
+        res = self.app.post(
+            '/api/v1/bookmarks',
+            content_type='application/json',
+            data=json.dumps(bookmark),
+            headers=[self.user1])
+        self.assertEqual(400, res.status_code)
+        self.assertEqual({'error': 'url field is mandatory'}, json.loads(res.get_data().decode()))
 
 if __name__ == '__main__':
     unittest.main()

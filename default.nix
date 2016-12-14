@@ -2,7 +2,7 @@ let
   pkgs = (import <nixpkgs> { }).overridePackages (pkgs: self: {
     # Upstream PR: https://github.com/NixOS/nixpkgs/pull/20590
     python3Packages = self.python3Packages // {
-      flask = self.python3Packages.buildPythonPackage {
+      flask = pkgs.python3Packages.buildPythonPackage {
         name = "flask-0.11.1";
 
         src = pkgs.fetchurl {
@@ -18,6 +18,30 @@ let
           license = licenses.bsd3;
         };
       };
+
+      flask_restful = pkgs.python3Packages.buildPythonPackage {
+        name = "flask-restful-0.3.5";
+
+        src = pkgs.fetchurl {
+          url = "mirror://pypi/F/Flask-RESTful/Flask-RESTful-0.3.5.tar.gz";
+          sha256 = "0hjcmdb56b7z4bkw848lxfkyrpnkwzmqn2dgnlv12mwvjpzsxr6c";
+        };
+
+        propagatedBuildInputs = with pkgs.python3Packages; [ flask pytz six aniso8601 ];
+
+        doCheck = false;
+      };
+
+      aniso8601 = pkgs.python3Packages.buildPythonPackage {
+        name = "aniso8601-1.2.0";
+
+        src = pkgs.fetchurl {
+          url = "mirror://pypi/a/aniso8601/aniso8601-1.2.0.tar.gz";
+          sha256 = "1m2d83rm684xdf54ynfd9lv3slv7bkqq6pcirh2aibvl4pw0092h";
+        };
+
+        propagatedBuildInputs = with pkgs.python3Packages; [ dateutil ];
+      };
     };
   });
 
@@ -27,5 +51,6 @@ in pkgs.python3Packages.buildPythonApplication {
   propagatedBuildInputs = [
     pkgs.python3Packages.flask
     pkgs.python3Packages.flask_login
+    pkgs.python3Packages.flask_restful
   ];
 }
