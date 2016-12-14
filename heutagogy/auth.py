@@ -10,7 +10,7 @@ class User(flask_login.UserMixin):
 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
-    return jsonify(error='Unauthorized'), 401
+    return {'error': 'Unauthorized'}, 401
 
 @login_manager.request_loader
 def request_loader(request):
