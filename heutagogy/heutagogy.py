@@ -12,6 +12,7 @@ app.config.update(dict(
     DEBUG=True))
 app.config.from_envvar('HEUTAGOGY_SETTINGS', silent=True)
 
+
 @app.cli.command('initdb')
 def initdb_command():
     """Creates the database tables."""

@@ -1,16 +1,19 @@
 from heutagogy import app
-from flask import jsonify
 import flask_login
+
 
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 
+
 class User(flask_login.UserMixin):
     pass
+
 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
     return {'error': 'Unauthorized'}, 401
+
 
 @login_manager.request_loader
 def request_loader(request):

@@ -10,4 +10,4 @@ setup(name='Heutagogy',
           'Flask',
           'Flask-Login',
       ],
-)
+      )

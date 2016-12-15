@@ -6,6 +6,7 @@ import tempfile
 import json
 import base64
 
+
 def authorization(username, password):
     '''
     Creates an Authorization header for the given username and
@@ -13,6 +14,7 @@ def authorization(username, password):
     '''
     token = (username + ':' + password).encode()
     return ('Authorization', 'Basic ' + base64.b64encode(token).decode())
+
 
 class HeutagogyTestCase(unittest.TestCase):
     def setUp(self):
@@ -41,7 +43,7 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
-            data=json.dumps({ 'url': 'https://github.com/' }),
+            data=json.dumps({'url': 'https://github.com/'}),
             headers=[self.user1])
         result = json.loads(res.get_data().decode())
 
@@ -53,7 +55,7 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
-            data=json.dumps({ 'url': 'https://github.com/' }))
+            data=json.dumps({'url': 'https://github.com/'}))
         result = json.loads(res.get_data().decode())
 
         self.assertEqual(401, res.status_code)
@@ -179,7 +181,8 @@ class HeutagogyTestCase(unittest.TestCase):
             '/api/v1/bookmarks',
             headers=[authorization('user1', 'wrongpass')])
         self.assertEqual(401, res.status_code)
-        self.assertEqual({'error': 'Unauthorized'}, json.loads(res.get_data().decode()))
+        self.assertEqual({'error': 'Unauthorized'},
+                         json.loads(res.get_data().decode()))
 
     def test_second_user_auth(self):
         res = self.app.get(
@@ -231,7 +234,8 @@ class HeutagogyTestCase(unittest.TestCase):
             data=json.dumps({'read': True}),
             headers=[self.user2])
         self.assertEqual(404, res.status_code)
-        self.assertEqual({'error': 'Not found'}, json.loads(res.get_data().decode()))
+        self.assertEqual({'error': 'Not found'},
+                         json.loads(res.get_data().decode()))
 
         res = self.app.get(
             '/api/v1/bookmark/{}'.format(bookmark_id),
@@ -248,7 +252,9 @@ class HeutagogyTestCase(unittest.TestCase):
             data=json.dumps(bookmark),
             headers=[self.user1])
         self.assertEqual(400, res.status_code)
-        self.assertEqual({'error': 'url field is mandatory'}, json.loads(res.get_data().decode()))
+        self.assertEqual({'error': 'url field is mandatory'},
+                         json.loads(res.get_data().decode()))
+
 
 if __name__ == '__main__':
     unittest.main()
