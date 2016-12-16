@@ -36,17 +36,36 @@ def initialize():
 def save_bookmark(user_id, bookmark):
     def save_fn(conn):
         c = conn.cursor()
-        c.execute('''
-                  INSERT INTO bookmarks(user, timestamp, url, title, read)
-                  VALUES (?, ?, ?, ?, ?)
-                  ''',
-                  (user_id,
-                   bookmark['timestamp'],
-                   bookmark['url'],
-                   bookmark['title'],
-                   bookmark['read']))
+        c.execute(
+            '''
+            INSERT INTO bookmarks(user, timestamp, url, title, read)
+            VALUES (?, ?, ?, ?, ?)
+            ''',
+            (user_id,
+             bookmark['timestamp'],
+             bookmark['url'],
+             bookmark['title'],
+             bookmark['read']))
         return dict(bookmark, id=c.lastrowid)
     return with_connection(save_fn)
+
+
+def set_bookmark(bookmark):
+    def set_fn(conn):
+        c = conn.cursor()
+        c.execute(
+            '''
+            UPDATE bookmarks
+            SET timestamp = ?, url = ?, title = ?, read = ?
+            WHERE rowid = ?
+            ''',
+            (bookmark['timestamp'],
+             bookmark['url'],
+             bookmark['title'],
+             bookmark['read'],
+             bookmark['id']))
+        return bookmark
+    return with_connection(set_fn)
 
 
 def row_to_bookmark(r):
@@ -89,18 +108,3 @@ def get_bookmark(user_id, bookmark_id):
         else:
             return result[0]
     return with_connection(get_fn)
-
-
-def set_read(bookmark_id, read):
-    def set_fn(conn):
-        c = conn.cursor()
-        c.execute(
-            '''
-            UPDATE bookmarks
-            SET read = ?
-            WHERE rowid = ?
-            ''',
-            (read, bookmark_id))
-        return {'read': read}
-
-    return with_connection(set_fn)
