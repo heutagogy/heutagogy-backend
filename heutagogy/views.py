@@ -66,4 +66,4 @@ class Bookmark(Resource):
 
 
 api.add_resource(Bookmarks, '/api/v1/bookmarks')
-api.add_resource(Bookmark,  '/api/v1/bookmark/<int:id>')
+api.add_resource(Bookmark,  '/api/v1/bookmarks/<int:id>')

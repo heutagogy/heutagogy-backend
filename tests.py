@@ -121,7 +121,7 @@ class HeutagogyTestCase(unittest.TestCase):
         bookmark_id = json.loads(res.get_data().decode())['id']
 
         res = self.app.get(
-            '/api/v1/bookmark/{}'.format(bookmark_id),
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
             content_type='application/json',
             data=json.dumps({'read': True}),
             headers=[self.user1])
@@ -144,7 +144,7 @@ class HeutagogyTestCase(unittest.TestCase):
         bookmark_id = result['id']
 
         res = self.app.post(
-            '/api/v1/bookmark/{}'.format(bookmark_id),
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
             content_type='application/json',
             data=json.dumps({'read': True}),
             headers=[self.user1])
@@ -165,13 +165,13 @@ class HeutagogyTestCase(unittest.TestCase):
         bookmark_id = json.loads(res.get_data().decode())['id']
 
         res = self.app.post(
-            '/api/v1/bookmark/{}'.format(bookmark_id),
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
             content_type='application/json',
             data=json.dumps({'read': True}),
             headers=[self.user1])
 
         res = self.app.get(
-            '/api/v1/bookmark/{}'.format(bookmark_id),
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
             headers=[self.user1])
 
         self.assertEqual(200, res.status_code)
@@ -217,7 +217,7 @@ class HeutagogyTestCase(unittest.TestCase):
         bookmark_id = json.loads(res.get_data().decode())['id']
 
         res = self.app.get(
-            '/api/v1/bookmark/{}'.format(bookmark_id),
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
             headers=[self.user2])
         self.assertEqual(404, res.status_code)
 
@@ -231,7 +231,7 @@ class HeutagogyTestCase(unittest.TestCase):
         bookmark_id = json.loads(res.get_data().decode())['id']
 
         res = self.app.post(
-            '/api/v1/bookmark/{}'.format(bookmark_id),
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
             content_type='application/json',
             data=json.dumps({'read': True}),
             headers=[self.user2])
@@ -240,7 +240,7 @@ class HeutagogyTestCase(unittest.TestCase):
                          json.loads(res.get_data().decode()))
 
         res = self.app.get(
-            '/api/v1/bookmark/{}'.format(bookmark_id),
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
             headers=[self.user1])
         self.assertEqual(False, json.loads(res.get_data().decode())['read'])
 
