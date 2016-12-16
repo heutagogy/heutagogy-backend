@@ -55,14 +55,19 @@ class Bookmark(Resource):
 
     @flask_login.login_required
     def post(self, id):
+        update = request.get_json()
+        if 'id' in update:
+            return {'error': 'Updating id is not allowed'}
+
         user_id = flask_login.current_user.id
         bookmark = heutagogy.persistence.get_bookmark(user_id, id)
         if bookmark is None:
             return {'error': 'Not found'}, 404
 
-        read = request.get_json()['read']
-        result = heutagogy.persistence.set_read(id, read)
-        return result
+        updated = dict(bookmark, **update)
+
+        result = heutagogy.persistence.set_bookmark(updated)
+        return result, 200
 
 
 api.add_resource(Bookmarks, '/api/v1/bookmarks')
