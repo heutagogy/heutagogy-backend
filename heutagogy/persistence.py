@@ -36,15 +36,16 @@ def initialize():
 def save_bookmark(user_id, bookmark):
     def save_fn(conn):
         c = conn.cursor()
-        c.execute('''
-                  INSERT INTO bookmarks(user, timestamp, url, title, read)
-                  VALUES (?, ?, ?, ?, ?)
-                  ''',
-                  (user_id,
-                   bookmark['timestamp'],
-                   bookmark['url'],
-                   bookmark['title'],
-                   bookmark['read']))
+        c.execute(
+            '''
+            INSERT INTO bookmarks(user, timestamp, url, title, read)
+            VALUES (?, ?, ?, ?, ?)
+            ''',
+            (user_id,
+             bookmark['timestamp'],
+             bookmark['url'],
+             bookmark['title'],
+             bookmark['read']))
         return dict(bookmark, id=c.lastrowid)
     return with_connection(save_fn)
 

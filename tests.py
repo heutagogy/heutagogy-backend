@@ -24,7 +24,9 @@ class HeutagogyTestCase(unittest.TestCase):
             'user1': {'password': 'password1'},
             'user2': {'password': 'password2'},
         }
+
         self.app = heutagogy.app.test_client()
+
         with heutagogy.app.app_context():
             heutagogy.persistence.initialize()
 
