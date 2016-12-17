@@ -9,13 +9,7 @@
 :auth = myuser:mypassword
 
 :url = http://:auth@:host
-:unauthorized = :url
-
-# Hello, world!
-GET :unauthorized/
-
-# Hello world with auth
-GET :url/
+:unauthorized = http://:host
 
 # Get all saved bookmarks (unauthorized)
 GET :unauthorized/api/v1/bookmarks
