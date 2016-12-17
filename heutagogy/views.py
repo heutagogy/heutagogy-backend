@@ -9,11 +9,6 @@ import datetime
 api = Api(app)
 
 
-@app.route('/')
-def index():
-    return 'Hello, world!'
-
-
 class Bookmarks(Resource):
     @flask_login.login_required
     def get(self):
@@ -30,7 +25,7 @@ class Bookmarks(Resource):
 
         bookmark = dict()
         bookmark['url'] = r['url']
-        bookmark['title'] = r['title'] if 'title' in r else bookmark['url']
+        bookmark['title'] = r.get('title', bookmark['url'])
 
         if 'timestamp' in r:
             bookmark['timestamp'] = r['timestamp']

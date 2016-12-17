@@ -42,10 +42,6 @@ class HeutagogyTestCase(unittest.TestCase):
         os.close(self.db_fd)
         os.unlink(heutagogy.app.config['DATABASE'])
 
-    def test_hello_world(self):
-        res = self.app.get('/')
-        assert b'Hello, world!' == res.data
-
     def test_post_bookmark(self):
         res = self.app.post(
             '/api/v1/bookmarks',
