@@ -286,6 +286,23 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual('https://github.com/', bookmark['url'])
         self.assertEqual('GitHub', bookmark['title'])
 
+    def test_post_bookmarks(self):
+        res = self.app.post(
+            '/api/v1/bookmarks',
+            content_type='application/json',
+            data=json.dumps([
+                {'url': 'https://github.com/'},
+                {'url': 'http://example.com/'}
+            ]),
+            headers=[self.user1])
+        result = get_json(res)
+
+        self.assertEqual(201, res.status_code)
+        self.assertEqual(1, result[0]['id'])
+        self.assertEqual("https://github.com/", result[0]['url'])
+        self.assertEqual(2, result[1]['id'])
+        self.assertEqual("http://example.com/", result[1]['url'])
+
 
 if __name__ == '__main__':
     unittest.main()
