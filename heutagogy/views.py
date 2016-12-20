@@ -21,31 +21,28 @@ class Bookmarks(Resource):
         r = request.get_json()
 
         if not r:
-            return {'error': 'url field is mandatory'}, 400
+            return {'error': 'payload is mandatory'}, 400
 
         if isinstance(r, dict):
             r = [r]
 
-        res = []
-        for data in r:
-            if 'url' not in data:
-                return {'error': 'url field is mandatory'}, 400
-            res.append(self.save(data))
-
-        return res[0] if len(res) == 1 else res, 201
-
-    def save(self, entity):
+        bookmarks = []
         current_user_id = flask_login.current_user.id
         now = datetime.datetime.utcnow().isoformat(' ')
 
-        bookmark = {
-            'read': entity.get('read', False),
-            'timestamp': entity.get('timestamp', now),
-            'title': entity.get('title', entity['url']),
-            'url': entity['url'],
-        }
+        for entity in r:
+            if 'url' not in entity:
+                return {'error': 'url field is mandatory'}, 400
 
-        return heutagogy.persistence.save_bookmark(current_user_id, bookmark)
+            bookmarks.append({
+                'read': entity.get('read', False),
+                'timestamp': entity.get('timestamp', now),
+                'title': entity.get('title', entity['url']),
+                'url': entity['url'],
+            })
+
+        res = heutagogy.persistence.save_bookmarks(current_user_id, bookmarks)
+        return res[0] if len(res) == 1 else res, 201
 
 
 class Bookmark(Resource):
