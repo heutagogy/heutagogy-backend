@@ -33,20 +33,23 @@ def initialize():
     with_connection(init_fn)
 
 
-def save_bookmark(user_id, bookmark):
+def save_bookmarks(user_id, bookmarks):
     def save_fn(conn):
+        res = []
         c = conn.cursor()
-        c.execute(
-            '''
-            INSERT INTO bookmarks(user, timestamp, url, title, read)
-            VALUES (?, ?, ?, ?, ?)
-            ''',
-            (user_id,
-             bookmark['timestamp'],
-             bookmark['url'],
-             bookmark['title'],
-             bookmark['read']))
-        return dict(bookmark, id=c.lastrowid)
+        for bookmark in bookmarks:
+            c.execute(
+                '''
+                INSERT INTO bookmarks(user, timestamp, url, title, read)
+                VALUES (?, ?, ?, ?, ?)
+                ''',
+                (user_id,
+                 bookmark['timestamp'],
+                 bookmark['url'],
+                 bookmark['title'],
+                 bookmark['read']))
+            res.append(dict(bookmark, id=c.lastrowid))
+        return res
     return with_connection(save_fn)
 
 
