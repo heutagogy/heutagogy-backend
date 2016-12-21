@@ -32,6 +32,19 @@ let
         doCheck = false;
       };
 
+      flask_jwt = pkgs.python3Packages.buildPythonPackage {
+        name = "flask-jwt-0.3.2";
+
+        src = pkgs.fetchurl {
+          url = "mirror://pypi/F/Flask-JWT/Flask-JWT-0.3.2.tar.gz";
+          sha256 = "49c0672fbde0f1cd3374bd834918d28956e3c521c7e00089cdc5380d323bd0ad";
+        };
+
+        propagatedBuildInputs = with pkgs.python3Packages; [ flask pyjwt ];
+
+        doCheck = false;
+      };
+
       aniso8601 = pkgs.python3Packages.buildPythonPackage {
         name = "aniso8601-1.2.0";
 
@@ -52,5 +65,6 @@ in pkgs.python3Packages.buildPythonApplication {
     pkgs.python3Packages.flask
     pkgs.python3Packages.flask_login
     pkgs.python3Packages.flask_restful
+    pkgs.python3Packages.flask_jwt
   ];
 }

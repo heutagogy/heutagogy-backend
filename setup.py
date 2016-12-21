@@ -9,6 +9,7 @@ setup(
     license='AGPL3',
     install_requires=[
         'Flask',
+        'Flask-JWT',
         'Flask-Login',
         'Flask-RESTful',
     ],
