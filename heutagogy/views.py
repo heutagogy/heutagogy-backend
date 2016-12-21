@@ -9,6 +9,18 @@ import datetime
 api = Api(app)
 
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    if request.method == 'OPTIONS':
+        allow_methods = 'DELETE, GET, POST, PUT'
+        response.headers['Access-Control-Allow-Methods'] = allow_methods
+        headers = request.headers.get('Access-Control-Request-Headers')
+        if headers:
+            response.headers['Access-Control-Allow-Headers'] = headers
+    return response
+
+
 class Bookmarks(Resource):
     @flask_login.login_required
     def get(self):
