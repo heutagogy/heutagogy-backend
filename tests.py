@@ -303,6 +303,20 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(2, result[1]['id'])
         self.assertEqual("http://example.com/", result[1]['url'])
 
+    def test_cors_headers(self):
+        res = self.app.options(
+            '/api/v1/bookmarks',
+            headers=[('Access-Control-Request-Headers',
+                      'authorization, content-type'),
+                     ('Access-Control-Request-Method', 'GET')])
+
+        self.assertEqual(res.headers['Access-Control-Allow-Origin'],
+                         '*')
+        self.assertEqual(res.headers['Access-Control-Allow-Methods'],
+                         'DELETE, GET, POST, PUT')
+        self.assertEqual(res.headers['Access-Control-Allow-Headers'],
+                         'authorization, content-type')
+
 
 if __name__ == '__main__':
     unittest.main()
