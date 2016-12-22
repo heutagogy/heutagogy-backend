@@ -4,8 +4,8 @@ from werkzeug.security import safe_str_cmp
 
 
 class User(object):
-    def __init__(self, id, username, password):
-        self.id = id
+    def __init__(self, username, password):
+        self.id = username
         self.username = username
         self.password = password
 
@@ -20,29 +20,24 @@ class User(object):
         }.get(key, None)
 
 
-def get_users():
-    users = []
-    for i, x in enumerate(app.config['USERS']):
-        users.append(User(i+1, x['username'], x['password']))
-    return users
+def get_user(username):
+    record = app.config['USERS'].get(username, None)
+    if record:
+        return User(username, record['password'])
+    else:
+        return None
 
 
 def authenticate(username, password):
-    users = get_users()
-    username_table = {u.username: u for u in users}
-    user = username_table.get(username, None)
+    user = get_user(username)
     if user and safe_str_cmp(
-        user.password.encode('utf-8'),
-        password.encode('utf-8')
-    ):
+            user.password.encode('utf-8'),
+            password.encode('utf-8')):
         return user
 
 
 def identity(payload):
-    users = get_users()
-    userid_table = {u.id: u for u in users}
-    user_id = payload['identity']
-    return userid_table.get(user_id, None)
+    return get_user(payload['identity'])
 
 
 jwt = JWT(app, authenticate, identity)
