@@ -5,23 +5,38 @@
 # See https://github.com/pashky/restclient.el
 #
 
-:host = 127.0.0.1:5000
-:auth = myuser:mypassword
+:username = "user2"
+:password = "pass2"
 
-:url = http://:auth@:host
-:unauthorized = http://:host
+:host = 127.0.0.1:5000
+:url = http://:host
+
+# Get auth token
+POST :url/login
+Content-Type: application/json
+
+{
+  "username": :username,
+  "password": :password
+}
+
+# Put token ↓↓↓ (use request above)
+:token = ???
 
 # Get all saved bookmarks (unauthorized)
-GET :unauthorized/api/v1/bookmarks
+GET :url/api/v1/bookmarks
 
 # Get all saved bookmarks (authorized)
 GET :url/api/v1/bookmarks
+Authorization: JWT :token
 
-# Get all saved bookmarks (bad credentials)
-GET http://badname:badpass@:host/api/v1/bookmarks
+# Get all saved bookmarks (bad token)
+GET :url/api/v1/bookmarks
+Authorization: JWT 42
 
 # Save bookmark
 POST :url/api/v1/bookmarks
+Authorization: JWT :token
 Content-Type: application/json
 
 {
@@ -31,8 +46,9 @@ Content-Type: application/json
 }
 
 # Save bookmark (no timestamp)
-# This will use current time
+# This will use current UTC time
 POST :url/api/v1/bookmarks
+Authorization: JWT :token
 Content-Type: application/json
 
 {
@@ -43,8 +59,10 @@ Content-Type: application/json
 # Save bookmark (no title)
 # This will use url as a title
 POST :url/api/v1/bookmarks
+Authorization: JWT :token
 Content-Type: application/json
 
 {
   "url": "https://github.com/heutagogy"
 }
+
