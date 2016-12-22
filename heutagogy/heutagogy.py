@@ -5,18 +5,17 @@ from datetime import timedelta
 
 app.config.from_object(__name__)
 app.config.update(dict(
-    USERS=[
-        {'username': 'myuser', 'password': 'mypassword'},
-        {'username': 'user2', 'password': 'pass2'},
-    ],
+    USERS={
+        'myuser': {'password': 'mypassword'},
+        'user2': {'password': 'pass2'},
+    },
     JWT_AUTH_URL_RULE='/login',
     JWT_EXPIRATION_DELTA=timedelta(seconds=2592000),  # 1 month
     DATABASE=os.path.join(app.root_path, 'heutagogy.sqlite3'),
     DEBUG=True))
-
 app.config.from_envvar('HEUTAGOGY_SETTINGS', silent=True)
 
-if (not app.config['SECRET_KEY']):
+if not app.config['SECRET_KEY']:
     app.config['SECRET_KEY'] = 'super-secret'
 
 

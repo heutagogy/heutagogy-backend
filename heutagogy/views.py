@@ -13,8 +13,8 @@ api = Api(app)
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
     if request.method == 'OPTIONS':
-        allow_methods = 'DELETE, GET, POST, PUT'
-        response.headers['Access-Control-Allow-Methods'] = allow_methods
+        response.headers['Access-Control-Allow-Methods'] = \
+            'DELETE, GET, POST, PUT'
         headers = request.headers.get('Access-Control-Request-Headers')
         if headers:
             response.headers['Access-Control-Allow-Headers'] = headers

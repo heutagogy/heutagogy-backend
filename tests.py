@@ -6,10 +6,12 @@ import tempfile
 import json
 
 
+def get_json(response):
+    '''Extracts json from the response.'''
+    return json.loads(response.get_data().decode())
+
+
 class HeutagogyTestCase(unittest.TestCase):
-    def get_json(self, response):
-        '''Extracts json from the response.'''
-        return json.loads(response.get_data().decode())
 
     def authorization(self, username, password):
         '''
@@ -23,17 +25,17 @@ class HeutagogyTestCase(unittest.TestCase):
                 'username': username,
                 'password': password
             }))
-        result = self.get_json(res)
+        result = get_json(res)
         token = result.get('access_token', None)
         return ('Authorization', 'JWT ' + token) if token else None
 
     def setUp(self):
         self.db_fd, heutagogy.app.config['DATABASE'] = tempfile.mkstemp()
         heutagogy.app.config['TESTING'] = True
-        heutagogy.app.config['USERS'] = [
-            {'username': 'user1', 'password': 'password1'},
-            {'username': 'user2', 'password': 'password2'}
-        ]
+        heutagogy.app.config['USERS'] = {
+            'user1': {'password': 'password1'},
+            'user2': {'password': 'password2'},
+        }
 
         self.app = heutagogy.app.test_client()
 
@@ -53,7 +55,7 @@ class HeutagogyTestCase(unittest.TestCase):
             content_type='application/json',
             data=json.dumps({'url': 'https://github.com/'}),
             headers=[self.user1])
-        result = self.get_json(res)
+        result = get_json(res)
 
         self.assertEqual(201, res.status_code)
         self.assertEqual(1, result['id'])
@@ -64,7 +66,7 @@ class HeutagogyTestCase(unittest.TestCase):
             '/api/v1/bookmarks',
             content_type='application/json',
             data=json.dumps({'url': 'https://github.com/'}))
-        result = self.get_json(res)
+        result = get_json(res)
 
         self.assertEqual(401, res.status_code)
         self.assertEqual('Authorization Required', result['error'])
@@ -76,7 +78,7 @@ class HeutagogyTestCase(unittest.TestCase):
     def test_get_bookmark_returns_nothing(self):
         res = self.app.get('/api/v1/bookmarks',
                            headers=[self.user1])
-        result = self.get_json(res)
+        result = get_json(res)
 
         self.assertEqual(200, res.status_code)
         self.assertEqual([], result)
@@ -95,7 +97,7 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.get(
             '/api/v1/bookmarks',
             headers=[self.user1])
-        result = self.get_json(res)
+        result = get_json(res)
 
         self.assertEqual(200, res.status_code)
         self.assertEqual([dict(bookmark, id=1, read=False)], result)
@@ -109,7 +111,7 @@ class HeutagogyTestCase(unittest.TestCase):
             content_type='application/json',
             data=json.dumps(bookmark),
             headers=[self.user1])
-        result = self.get_json(res)
+        result = get_json(res)
 
         self.assertEqual(201, res.status_code)
         self.assertFalse(result['read'])
@@ -124,14 +126,14 @@ class HeutagogyTestCase(unittest.TestCase):
             data=json.dumps(bookmark),
             headers=[self.user1])
 
-        bookmark_id = self.get_json(res)['id']
+        bookmark_id = get_json(res)['id']
 
         res = self.app.get(
             '/api/v1/bookmarks/{}'.format(bookmark_id),
             content_type='application/json',
             data=json.dumps({'read': True}),
             headers=[self.user1])
-        result = self.get_json(res)
+        result = get_json(res)
 
         self.assertEqual(200, res.status_code)
         self.assertFalse(result['read'])
@@ -145,7 +147,7 @@ class HeutagogyTestCase(unittest.TestCase):
             content_type='application/json',
             data=json.dumps(bookmark),
             headers=[self.user1])
-        result = self.get_json(res)
+        result = get_json(res)
 
         bookmark_id = result['id']
 
@@ -156,7 +158,7 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user1])
 
         self.assertEqual(200, res.status_code)
-        result = self.get_json(res)
+        result = get_json(res)
         self.assertTrue(result['read'])
 
     def test_mark_as_read_updates_read(self):
@@ -168,7 +170,7 @@ class HeutagogyTestCase(unittest.TestCase):
             content_type='application/json',
             data=json.dumps(bookmark),
             headers=[self.user1])
-        bookmark_id = self.get_json(res)['id']
+        bookmark_id = get_json(res)['id']
 
         res = self.app.post(
             '/api/v1/bookmarks/{}'.format(bookmark_id),
@@ -181,7 +183,7 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user1])
 
         self.assertEqual(200, res.status_code)
-        result = self.get_json(res)
+        result = get_json(res)
         self.assertTrue(result['read'])
 
     def test_wrong_pass(self):
@@ -192,9 +194,14 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
-            headers=[('Authorization', 'JWT 42')],
+            headers=[('Authorization', 'JWT '
+                      + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.'
+                      + 'eyJuYmYiOjE0ODI0MjE2NzUsImlhdCI6MTQ4M'
+                      + 'jQyMTY3NSwiZXhwIjoxNDg1MDEzNjc1LCJpZG'
+                      + 'VudGl0eSI6InVzZXIzIn0.ZumbtlrLZAW0R60'
+                      + 'kiJKASGU29AoAUVMMLmwLqvuWzz8')],
             data=json.dumps({'url': 'https://github.com/'}))
-        result = self.get_json(res)
+        result = get_json(res)
 
         self.assertEqual(401, res.status_code)
         self.assertEqual('Invalid token', result['error'])
@@ -218,7 +225,7 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user2])
         self.assertEqual(200, res.status_code)
 
-        self.assertEqual([], self.get_json(res))
+        self.assertEqual([], get_json(res))
 
     def test_user_cant_read_other_bookmarks_directly(self):
         res = self.app.post(
@@ -227,7 +234,7 @@ class HeutagogyTestCase(unittest.TestCase):
             data=json.dumps({'url': 'https://github.com/'}),
             headers=[self.user1])
         self.assertEqual(201, res.status_code)
-        bookmark_id = self.get_json(res)['id']
+        bookmark_id = get_json(res)['id']
 
         res = self.app.get(
             '/api/v1/bookmarks/{}'.format(bookmark_id),
@@ -241,7 +248,7 @@ class HeutagogyTestCase(unittest.TestCase):
             data=json.dumps({'url': 'https://github.com/'}),
             headers=[self.user1])
         self.assertEqual(201, res.status_code)
-        bookmark_id = self.get_json(res)['id']
+        bookmark_id = get_json(res)['id']
 
         res = self.app.post(
             '/api/v1/bookmarks/{}'.format(bookmark_id),
@@ -250,12 +257,12 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user2])
         self.assertEqual(404, res.status_code)
         self.assertEqual({'error': 'Not found'},
-                         self.get_json(res))
+                         get_json(res))
 
         res = self.app.get(
             '/api/v1/bookmarks/{}'.format(bookmark_id),
             headers=[self.user1])
-        self.assertFalse(self.get_json(res)['read'])
+        self.assertFalse(get_json(res)['read'])
 
     def test_new_bookmark_requires_url(self):
         bookmark = {
@@ -268,7 +275,7 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user1])
         self.assertEqual(400, res.status_code)
         self.assertEqual({'error': 'url field is mandatory'},
-                         self.get_json(res))
+                         get_json(res))
 
     def test_update_bookmark(self):
         res = self.app.post(
@@ -278,7 +285,7 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user1])
         self.assertEqual(201, res.status_code)
 
-        bookmark_id = self.get_json(res)['id']
+        bookmark_id = get_json(res)['id']
 
         res = self.app.post(
             'api/v1/bookmarks/{}'.format(bookmark_id),
@@ -286,7 +293,7 @@ class HeutagogyTestCase(unittest.TestCase):
             data=json.dumps({'title': 'GitHub'}),
             headers=[self.user1])
         self.assertEqual(200, res.status_code)
-        bookmark = self.get_json(res)
+        bookmark = get_json(res)
         self.assertEqual('https://github.com/', bookmark['url'])
         self.assertEqual('GitHub', bookmark['title'])
 
@@ -294,7 +301,7 @@ class HeutagogyTestCase(unittest.TestCase):
             'api/v1/bookmarks/{}'.format(bookmark_id),
             headers=[self.user1])
         self.assertEqual(200, res.status_code)
-        bookmark = self.get_json(res)
+        bookmark = get_json(res)
         self.assertEqual('https://github.com/', bookmark['url'])
         self.assertEqual('GitHub', bookmark['title'])
 
@@ -307,7 +314,7 @@ class HeutagogyTestCase(unittest.TestCase):
                 {'url': 'http://example.com/'}
             ]),
             headers=[self.user1])
-        result = self.get_json(res)
+        result = get_json(res)
 
         self.assertEqual(201, res.status_code)
         self.assertEqual(1, result[0]['id'])
