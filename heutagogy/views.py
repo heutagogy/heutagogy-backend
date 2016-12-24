@@ -40,7 +40,7 @@ class Bookmarks(Resource):
 
         bookmarks = []
         current_user_id = current_identity.id
-        now = datetime.datetime.utcnow().isoformat(' ')
+        now = datetime.datetime.utcnow().isoformat()
 
         for entity in r:
             if 'url' not in entity:
