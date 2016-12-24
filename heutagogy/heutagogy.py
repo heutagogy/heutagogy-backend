@@ -9,7 +9,7 @@ app.config.update(dict(
         'myuser': {'password': 'mypassword'},
         'user2': {'password': 'pass2'},
     },
-    JWT_AUTH_URL_RULE='/login',
+    JWT_AUTH_URL_RULE='/api/v1/login',
     JWT_EXPIRATION_DELTA=timedelta(seconds=2592000),  # 1 month
     DATABASE=os.path.join(app.root_path, 'heutagogy.sqlite3'),
     DEBUG=True))
