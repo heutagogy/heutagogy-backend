@@ -19,7 +19,7 @@ class HeutagogyTestCase(unittest.TestCase):
         password.
         '''
         res = self.app.post(
-            '/login',
+            '/api/v1/login',
             content_type='application/json',
             data=json.dumps({
                 'username': username,
