@@ -23,3 +23,8 @@ if not app.config['SECRET_KEY']:
 def initdb_command():
     """Creates the database tables."""
     heutagogy.persistence.initialize()
+
+
+with app.app_context():
+    if not os.path.isfile(app.config['DATABASE']):
+        heutagogy.persistence.initialize()

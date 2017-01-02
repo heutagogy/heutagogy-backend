@@ -1,6 +1,7 @@
 {
   "name": "heutagogy-backend",
   "scripts": {
+    "postdeploy": "env FLASK_APP=heutagogy/heutagogy.py flask initdb"
   },
   "env": {
   },
