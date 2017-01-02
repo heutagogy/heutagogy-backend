@@ -3,7 +3,7 @@ import heutagogy.persistence
 
 from flask_jwt import jwt_required, current_identity
 from flask import request
-from flask_restful import Resource, Api, abort
+from flask_restful import Resource, Api
 import datetime
 
 api = Api(app)
@@ -63,14 +63,14 @@ class Bookmark(Resource):
         current_user_id = current_identity.id
         bookmark = heutagogy.persistence.get_bookmark(current_user_id, id)
         if bookmark is None:
-            abort(404)
+            return {'error': 'Not found'}, 404
         return bookmark
 
     @jwt_required()
     def post(self, id):
         update = request.get_json()
         if 'id' in update:
-            return {'error': 'Updating id is not allowed'}
+            return {'error': 'Updating id is not allowed'}, 400
 
         current_user_id = current_identity.id
         bookmark = heutagogy.persistence.get_bookmark(current_user_id, id)

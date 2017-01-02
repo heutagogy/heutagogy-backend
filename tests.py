@@ -336,6 +336,41 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(res.headers['Access-Control-Allow-Headers'],
                          'authorization, content-type')
 
+    def test_get_nonexistent_bookmark(self):
+        res = self.app.get(
+            'api/v1/bookmarks/1',
+            headers=[self.user1])
+        self.assertEqual(404, res.status_code)
+        self.assertEqual({'error': 'Not found'}, get_json(res))
+
+    def test_post_nonexistent_bookmark(self):
+        res = self.app.post(
+            'api/v1/bookmarks/1',
+            content_type='application/json',
+            data=json.dumps({'title': 'new title'}),
+            headers=[self.user1])
+        self.assertEqual(404, res.status_code)
+        self.assertEqual({'error': 'Not found'}, get_json(res))
+
+    def test_updating_id_is_error(self):
+        res = self.app.post(
+            '/api/v1/bookmarks',
+            content_type='application/json',
+            data=json.dumps([
+                {'url': 'https://github.com/'},
+            ]),
+            headers=[self.user1])
+        bookmark_id = get_json(res)['id']
+
+        res = self.app.post(
+            'api/v1/bookmarks/{}'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps({'id': 2}),
+            headers=[self.user1])
+        self.assertEqual(400, res.status_code)
+        self.assertEqual({'error': 'Updating id is not allowed'},
+                         get_json(res))
+
 
 if __name__ == '__main__':
     unittest.main()
