@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 import heutagogy
-from heutagogy.persistence import db
+from heutagogy.persistence import db, User
 import unittest
 import tempfile
 import json
@@ -35,12 +35,12 @@ class HeutagogyTestCase(unittest.TestCase):
         heutagogy.app.config['SQLALCHEMY_DATABASE_URI'] = \
             'sqlite:///' + self.db_file
         heutagogy.app.config['TESTING'] = True
-        heutagogy.app.config['USERS'] = {
-            'user1': {'password': 'password1'},
-            'user2': {'password': 'password2'},
-        }
 
         db.create_all()
+
+        db.session.add(User('user1', 'random@gmail.com', 'password1'))
+        db.session.add(User('user2', 'modnar@gmail.com', 'password2'))
+        db.session.commit()
 
         self.app = heutagogy.app.test_client()
 

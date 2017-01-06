@@ -6,8 +6,28 @@ import datetime
 db = SQLAlchemy(app)
 
 
+class User(db.Model):
+    id = db.Column(db.String, primary_key=True)
+    username = db.Column(db.String, unique=True)
+    email = db.Column(db.String, unique=True)
+    password = db.Column(db.String)
 
+    def __init__(self, username, email, password):
+        self.id = username
+        self.username = username
+        self.email = email
+        self.password = password
 
+    def __str__(self):
+        return "User(%s)" % self.username
+
+    def __getitem__(self, key):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'password': self.password,
+        }.get(key, None)
 
 
 class Bookmark(db.Model):
