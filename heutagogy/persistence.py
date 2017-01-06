@@ -1,6 +1,7 @@
 from heutagogy import app
 from flask_sqlalchemy import SQLAlchemy
 import datetime
+import bcrypt
 
 
 db = SQLAlchemy(app)
@@ -16,7 +17,10 @@ class User(db.Model):
         self.id = username
         self.username = username
         self.email = email
-        self.password = password
+        self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
+    def check_password(self, password):
+        return bcrypt.checkpw(password.encode(), self.password)
 
     def __str__(self):
         return "User(%s)" % self.username

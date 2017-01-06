@@ -10,9 +10,7 @@ def get_user(username):
 
 def authenticate(username, password):
     user = get_user(username)
-    if user and safe_str_cmp(
-            user.password.encode('utf-8'),
-            password.encode('utf-8')):
+    if user and user.check_password(password):
         return user
 
 

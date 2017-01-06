@@ -66,5 +66,6 @@ in pkgs.python3Packages.buildPythonApplication {
     pkgs.python3Packages.flask_restful
     pkgs.python3Packages.flask_jwt
     pkgs.python3Packages.flask_sqlalchemy
+    pkgs.python3Packages.pybcrypt
   ];
 }
