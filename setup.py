@@ -11,5 +11,7 @@ setup(
         'Flask',
         'Flask-JWT',
         'Flask-RESTful',
+        'Flask-SQLAlchemy',
+        'bcrypt',
     ],
 )

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import heutagogy
+from heutagogy.persistence import db, User
 import unittest
 import tempfile
 import json
@@ -30,24 +31,26 @@ class HeutagogyTestCase(unittest.TestCase):
         return ('Authorization', 'JWT ' + token) if token else None
 
     def setUp(self):
-        self.db_fd, heutagogy.app.config['DATABASE'] = tempfile.mkstemp()
+        self.db_fd, self.db_file = tempfile.mkstemp()
+        heutagogy.app.config['SQLALCHEMY_DATABASE_URI'] = \
+            'sqlite:///' + self.db_file
         heutagogy.app.config['TESTING'] = True
-        heutagogy.app.config['USERS'] = {
-            'user1': {'password': 'password1'},
-            'user2': {'password': 'password2'},
-        }
+
+        db.create_all()
+
+        db.session.add(User('user1', 'random@gmail.com', 'password1'))
+        db.session.add(User('user2', 'modnar@gmail.com', 'password2'))
+        db.session.commit()
 
         self.app = heutagogy.app.test_client()
-
-        with heutagogy.app.app_context():
-            heutagogy.persistence.initialize()
 
         self.user1 = self.authorization('user1', 'password1')
         self.user2 = self.authorization('user2', 'password2')
 
     def tearDown(self):
         os.close(self.db_fd)
-        os.unlink(heutagogy.app.config['DATABASE'])
+        db.drop_all()
+        os.unlink(self.db_file)
 
     def test_post_bookmark(self):
         res = self.app.post(
@@ -87,7 +90,7 @@ class HeutagogyTestCase(unittest.TestCase):
         bookmark = {
             'url': 'https://github.com/',
             'title': 'GitHub front page',
-            'timestamp': '2016-11-06 01:31:15',
+            'timestamp': '2016-11-06T01:31:15',
         }
         res = self.app.post(
             '/api/v1/bookmarks',

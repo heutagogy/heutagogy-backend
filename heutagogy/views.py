@@ -1,10 +1,11 @@
 from heutagogy import app
-import heutagogy.persistence
+import heutagogy.persistence as db
 
 from flask_jwt import jwt_required, current_identity
 from flask import request
 from flask_restful import Resource, Api
 import datetime
+import aniso8601
 
 api = Api(app)
 
@@ -25,8 +26,8 @@ class Bookmarks(Resource):
     @jwt_required()
     def get(self):
         current_user_id = current_identity.id
-        result = heutagogy.persistence.get_bookmarks(current_user_id)
-        return result
+        result = db.Bookmark.query.filter_by(user=current_user_id)
+        return list(map(lambda x: x.to_dict(), result))
 
     @jwt_required()
     def post(self):
@@ -46,14 +47,19 @@ class Bookmarks(Resource):
             if 'url' not in entity:
                 return {'error': 'url field is mandatory'}, 400
 
-            bookmarks.append({
-                'read': entity.get('read', False),
-                'timestamp': entity.get('timestamp', now),
-                'title': entity.get('title', entity['url']),
-                'url': entity['url'],
-            })
+            bookmarks.append(db.Bookmark(
+                user=current_user_id,
+                url=entity['url'],
+                title=entity.get('title', None),
+                timestamp=aniso8601.parse_datetime(
+                    entity.get('timestamp', now)),
+                read=entity.get('read', False)))
 
-        res = heutagogy.persistence.save_bookmarks(current_user_id, bookmarks)
+        for bookmark in bookmarks:
+            db.db.session.add(bookmark)
+        db.db.session.commit()
+
+        res = list(map(lambda x: x.to_dict(), bookmarks))
         return res[0] if len(res) == 1 else res, 201
 
 
@@ -61,10 +67,12 @@ class Bookmark(Resource):
     @jwt_required()
     def get(self, id):
         current_user_id = current_identity.id
-        bookmark = heutagogy.persistence.get_bookmark(current_user_id, id)
+        bookmark = db.Bookmark.query \
+                              .filter_by(id=id, user=current_user_id) \
+                              .first()
         if bookmark is None:
             return {'error': 'Not found'}, 404
-        return bookmark
+        return bookmark.to_dict()
 
     @jwt_required()
     def post(self, id):
@@ -73,14 +81,25 @@ class Bookmark(Resource):
             return {'error': 'Updating id is not allowed'}, 400
 
         current_user_id = current_identity.id
-        bookmark = heutagogy.persistence.get_bookmark(current_user_id, id)
+        bookmark = db.Bookmark.query \
+                              .filter_by(id=id, user=current_user_id) \
+                              .first()
         if bookmark is None:
             return {'error': 'Not found'}, 404
 
-        updated = dict(bookmark, **update)
+        if 'url' in update:
+            bookmark.url = update['url']
+        if 'title' in update:
+            bookmark.title = update['title']
+        if 'timestamp' in update:
+            bookmark.timestamp = aniso8601.parse_datetime(update['timestamp'])
+        if 'read' in update:
+            bookmark.read = update['read']
 
-        result = heutagogy.persistence.set_bookmark(updated)
-        return result, 200
+        db.db.session.add(bookmark)
+        db.db.session.commit()
+
+        return bookmark.to_dict(), 200
 
 
 api.add_resource(Bookmarks, '/api/v1/bookmarks')
