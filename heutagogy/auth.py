@@ -1,7 +1,6 @@
 from heutagogy import app
 from heutagogy.persistence import User
 from flask_jwt import JWT
-from werkzeug.security import safe_str_cmp
 
 
 def get_user(username):
