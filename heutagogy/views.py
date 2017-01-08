@@ -102,5 +102,22 @@ class Bookmark(Resource):
         return bookmark.to_dict(), 200
 
 
+class Users(Resource):
+    def post(self):
+        user = request.get_json()
+        if 'username' not in user:
+            return {'error': "'username' field is mandatory"}, 400
+        if 'password' not in user:
+            return {'error': "'password' field is mandatory"}, 400
+
+        db.db.session.add(db.User(user['username'],
+                                  user.get('email', None),
+                                  user['password']))
+        db.db.session.commit()
+
+        return None, 201
+
+
 api.add_resource(Bookmarks, '/api/v1/bookmarks')
 api.add_resource(Bookmark,  '/api/v1/bookmarks/<int:id>')
+api.add_resource(Users,     '/api/v1/users')
