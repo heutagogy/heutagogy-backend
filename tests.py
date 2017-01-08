@@ -374,6 +374,23 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual({'error': 'Updating id is not allowed'},
                          get_json(res))
 
+    def test_create_user(self):
+        res = self.app.post(
+            '/api/v1/users',
+            content_type='application/json',
+            data=json.dumps({'username': 'rasen',
+                             'password': 'topsecret'}))
+        self.assertEqual(201, res.status_code)
+
+        res = self.app.post(
+            '/api/v1/login',
+            content_type='application/json',
+            data=json.dumps({
+                'username': 'rasen',
+                'password': 'topsecret',
+            }))
+        self.assertEqual(200, res.status_code)
+
 
 if __name__ == '__main__':
     unittest.main()
