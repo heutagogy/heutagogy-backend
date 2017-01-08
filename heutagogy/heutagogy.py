@@ -8,8 +8,7 @@ app.config.update(dict(
     JWT_EXPIRATION_DELTA=timedelta(seconds=2592000),  # 1 month
     SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.root_path,
                                                         'heutagogy.sqlite3'),
-    SQLALCHEMY_TRACK_MODIFICATIONS=False,
-    DEBUG=True))
+    SQLALCHEMY_TRACK_MODIFICATIONS=False))
 app.config.from_envvar('HEUTAGOGY_SETTINGS', silent=True)
 
 if not app.config['SECRET_KEY']:
