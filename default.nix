@@ -10,8 +10,9 @@ in python.mkDerivation {
 
   propagatedBuildInputs = [
     python.packages.Flask
-    python.packages.Flask-RESTful
     python.packages.Flask-JWT
+    python.packages.Flask-Login
+    python.packages.Flask-RESTful
     python.packages.Flask-SQLAlchemy
     python.packages.bcrypt
   ];
