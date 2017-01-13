@@ -1,6 +1,7 @@
 from heutagogy import app
 from heutagogy.persistence import User
-from flask_jwt import JWT
+from flask_jwt import JWT, jwt_required, current_identity
+import flask_login
 
 
 def get_user(username):
@@ -14,7 +15,20 @@ def authenticate(username, password):
 
 
 def identity(payload):
-    return get_user(payload['identity'])
+    user = get_user(payload['identity'])
+    if user:
+        # this field is needed for Flask-Login
+        user.is_authenticated = True
+    return user
 
 
 jwt = JWT(app, authenticate, identity)
+
+
+login_manager = flask_login.LoginManager(app)
+
+
+@login_manager.request_loader
+@jwt_required()
+def load_user_from_request(request):
+    return current_identity

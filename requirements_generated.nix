@@ -46,6 +46,23 @@ self: {
 
 
 
+  "Flask-Login" = python.mkDerivation {
+    name = "Flask-Login-0.4.0";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/70/96/20cae731ef27084dcb183f3a6e3073d0232f10c1fd7be76729bd7bd4b994/Flask-Login-0.4.0.tar.gz"; sha256 = "d25e356b14a59f52da0ab30c31c2ad285fa23a840f0f6971df7ed247c77082a7"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."Flask"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.mit;
+      description = "User session management for Flask";
+    };
+  };
+
+
+
   "Flask-RESTful" = python.mkDerivation {
     name = "Flask-RESTful-0.3.5";
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/00/f6/250e9e11e96088a69a410adf6bcaa68651a285f40b2c41e0c27b2d579f4a/Flask-RESTful-0.3.5.tar.gz"; sha256 = "cce4aeff959b571136b5af098bebe7d3deeca7eb1411c4e722ff2c5356ab4c42"; };
@@ -85,8 +102,8 @@ self: {
 
 
   "Jinja2" = python.mkDerivation {
-    name = "Jinja2-2.9";
-    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/44/af/6d8f605d188a50b11ec17fcd93e612c77197f2cd816facd5fea8aef7802e/Jinja2-2.9.tar.gz"; sha256 = "bc5ce80fba5561ed94807f91e42e608b04b92861e22f8f79cef3af0444046f5d"; };
+    name = "Jinja2-2.9.4";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/f4/3f/28387a5bbc6883082c16784c6135440b94f9d5938fb156ff579798e18eda/Jinja2-2.9.4.tar.gz"; sha256 = "aab8d8ca9f45624f1e77f2844bf3c144d180e97da8824c2a6d7552ad039b5442"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
     propagatedBuildInputs = [

@@ -1,7 +1,7 @@
 from heutagogy import app
 import heutagogy.persistence as db
 
-from flask_jwt import jwt_required, current_identity
+from flask_login import login_required, current_user
 from flask import request
 from flask_restful import Resource, Api
 import datetime
@@ -23,13 +23,13 @@ def after_request(response):
 
 
 class Bookmarks(Resource):
-    @jwt_required()
+    @login_required
     def get(self):
-        current_user_id = current_identity.id
+        current_user_id = current_user.id
         result = db.Bookmark.query.filter_by(user=current_user_id)
         return list(map(lambda x: x.to_dict(), result))
 
-    @jwt_required()
+    @login_required
     def post(self):
         r = request.get_json()
 
@@ -40,7 +40,7 @@ class Bookmarks(Resource):
             r = [r]
 
         bookmarks = []
-        current_user_id = current_identity.id
+        current_user_id = current_user.id
         now = datetime.datetime.utcnow().isoformat()
 
         for entity in r:
@@ -64,9 +64,9 @@ class Bookmarks(Resource):
 
 
 class Bookmark(Resource):
-    @jwt_required()
+    @login_required
     def get(self, id):
-        current_user_id = current_identity.id
+        current_user_id = current_user.id
         bookmark = db.Bookmark.query \
                               .filter_by(id=id, user=current_user_id) \
                               .first()
@@ -74,13 +74,13 @@ class Bookmark(Resource):
             return {'error': 'Not found'}, 404
         return bookmark.to_dict()
 
-    @jwt_required()
+    @login_required
     def post(self, id):
         update = request.get_json()
         if 'id' in update:
             return {'error': 'Updating id is not allowed'}, 400
 
-        current_user_id = current_identity.id
+        current_user_id = current_user.id
         bookmark = db.Bookmark.query \
                               .filter_by(id=id, user=current_user_id) \
                               .first()
