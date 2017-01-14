@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-import os
 import heutagogy
 from heutagogy.persistence import db, User
 import unittest
-import tempfile
 import json
 
 
@@ -31,9 +29,7 @@ class HeutagogyTestCase(unittest.TestCase):
         return ('Authorization', 'JWT ' + token) if token else None
 
     def setUp(self):
-        self.db_fd, self.db_file = tempfile.mkstemp()
-        heutagogy.app.config['SQLALCHEMY_DATABASE_URI'] = \
-            'sqlite:///' + self.db_file
+        heutagogy.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         heutagogy.app.config['TESTING'] = True
 
         db.create_all()
@@ -48,9 +44,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.user2 = self.authorization('user2', 'password2')
 
     def tearDown(self):
-        os.close(self.db_fd)
         db.drop_all()
-        os.unlink(self.db_file)
 
     def test_post_bookmark(self):
         res = self.app.post(
