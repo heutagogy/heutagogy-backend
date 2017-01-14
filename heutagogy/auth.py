@@ -21,7 +21,7 @@ class User(db.Model, flask_user.UserMixin):
     username = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
 
-    email = db.Column(db.String(255), nullable=False, unique=True)
+    email = db.Column(db.String(255), unique=True)
     confirmed_at = db.Column(db.DateTime())
 
     active = db.Column('is_active', db.Boolean(), nullable=False,
