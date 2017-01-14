@@ -40,8 +40,17 @@ class HeutagogyTestCase(unittest.TestCase):
 
         self.app = heutagogy.app.test_client()
 
-        self.user1 = self.authorization('user1', 'password1')
-        self.user2 = self.authorization('user2', 'password2')
+    @property
+    def user1(self):
+        if not hasattr(self, '_user1'):
+            self._user1 = self.authorization('user1', 'password1')
+        return self._user1
+
+    @property
+    def user2(self):
+        if not hasattr(self, '_user2'):
+            self._user2 = self.authorization('user2', 'password2')
+        return self._user2
 
     def tearDown(self):
         db.drop_all()
