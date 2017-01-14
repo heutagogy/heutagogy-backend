@@ -1,1 +1,4 @@
+Heutagogy.egg-info/
+heutagogy/heutagogy.sqlite3
 __pycache__/
+*.pyc

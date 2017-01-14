@@ -63,6 +63,24 @@ self: {
 
 
 
+  "Flask-Mail" = python.mkDerivation {
+    name = "Flask-Mail-0.9.1";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/05/2f/6a545452040c2556559779db87148d2a85e78a26f90326647b51dc5e81e9/Flask-Mail-0.9.1.tar.gz"; sha256 = "22e5eb9a940bf407bcf30410ecc3708f3c56cc44b29c34e1726fe85006935f41"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."Flask"
+      self."blinker"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "Flask extension for sending email";
+    };
+  };
+
+
+
   "Flask-RESTful" = python.mkDerivation {
     name = "Flask-RESTful-0.3.5";
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/00/f6/250e9e11e96088a69a410adf6bcaa68651a285f40b2c41e0c27b2d579f4a/Flask-RESTful-0.3.5.tar.gz"; sha256 = "cce4aeff959b571136b5af098bebe7d3deeca7eb1411c4e722ff2c5356ab4c42"; };
@@ -96,6 +114,48 @@ self: {
       homepage = "";
       license = licenses.bsdOriginal;
       description = "Adds SQLAlchemy support to your Flask application";
+    };
+  };
+
+
+
+  "Flask-User" = python.mkDerivation {
+    name = "Flask-User-0.6.11";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/48/3d/9e94d980626a4c533b8bf3e0ae203574ded41274480b6cc9fe319f79c227/Flask-User-0.6.11.tar.gz"; sha256 = "fc12968b8fa437942116c0f03b2346b25b9b25ee6ff63acb89f626f80aef35bc"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."Flask"
+      self."Flask-Login"
+      self."Flask-Mail"
+      self."Flask-SQLAlchemy"
+      self."Flask-WTF"
+      self."bcrypt"
+      self."passlib"
+      self."pycryptodome"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "Customizable User Account Management for Flask: Register, Confirm email, Login, Change username, Change password, Forgot password and more.";
+    };
+  };
+
+
+
+  "Flask-WTF" = python.mkDerivation {
+    name = "Flask-WTF-0.14.2";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/ba/15/00a9693180f214225a2c0b1bb9077f3b0b21f2e86522cbba22e8ad6e570c/Flask-WTF-0.14.2.tar.gz"; sha256 = "5d14d55cfd35f613d99ee7cba0fc3fbbe63ba02f544d349158c14ca15561cc36"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."Flask"
+      self."WTForms"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "Simple integration of Flask and WTForms.";
     };
   };
 
@@ -163,6 +223,21 @@ self: {
 
 
 
+  "WTForms" = python.mkDerivation {
+    name = "WTForms-2.1";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/bf/91/2e553b86c55e9cf2f33265de50e052441fb753af46f5f20477fe9c61280e/WTForms-2.1.zip"; sha256 = "ffdf10bd1fa565b8233380cb77a304cd36fd55c73023e91d4b803c96bc11d46f"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "A flexible forms validation and rendering library for python web development.";
+    };
+  };
+
+
+
   "Werkzeug" = python.mkDerivation {
     name = "Werkzeug-0.11.15";
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/fe/7f/6d70f765ce5484e07576313897793cb49333dd34e462488ee818d17244af/Werkzeug-0.11.15.tar.gz"; sha256 = "455d7798ac263266dbd38d4841f7534dd35ca9c3da4a8df303f8488f38f3bcc0"; };
@@ -208,6 +283,21 @@ self: {
       homepage = "";
       license = licenses.asl20;
       description = "Modern password hashing for your software and your servers";
+    };
+  };
+
+
+
+  "blinker" = python.mkDerivation {
+    name = "blinker-1.4";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/1b/51/e2a9f3b757eb802f61dc1f2b09c8c99f6eb01cf06416c0671253536517b6/blinker-1.4.tar.gz"; sha256 = "471aee25f3992bd325afa3772f1063dbdbbca947a041b8b89466dc00d606f8b6"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.mit;
+      description = "Fast, simple object-to-object and broadcast signaling";
     };
   };
 
@@ -275,6 +365,23 @@ self: {
 
 
 
+  "passlib" = python.mkDerivation {
+    name = "passlib-1.7.0.post20170114013344";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/c7/9b/e09ca2fa46ad1503071a87a9398b424ceb38ec5fad689cbd235df1321d09/passlib-1.7.0.tar.gz"; sha256 = "0be4f6053357c4ebba5578a065fbdad75a844501d4c6d91d4a3a0c1594c6abed"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."bcrypt"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "comprehensive password hashing framework supporting over 30 schemes";
+    };
+  };
+
+
+
   "pycparser" = python.mkDerivation {
     name = "pycparser-2.17";
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/be/64/1bb257ffb17d01f4a38d7ce686809a736837ad4371bcc5c42ba7a715c3ac/pycparser-2.17.tar.gz"; sha256 = "0aac31e917c24cb3357f5a4d5566f2cc91a19ca41862f6c3c22dc60a629673b6"; };
@@ -285,6 +392,21 @@ self: {
       homepage = "";
       license = licenses.bsdOriginal;
       description = "C parser in Python";
+    };
+  };
+
+
+
+  "pycryptodome" = python.mkDerivation {
+    name = "pycryptodome-3.4.3";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/45/ef/4514a01be3d8f5383cd12fc5612ffd8a2508ac7e7ff6bde2da708e71c9a3/pycryptodome-3.4.3.tar.gz"; sha256 = "4b1697b5787afe8e7fd81b96ff4501376f52cb80fc9dd684f6989ea3b69853f4"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "Cryptographic library for Python";
     };
   };
 

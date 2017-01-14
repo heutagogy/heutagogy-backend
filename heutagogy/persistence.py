@@ -1,37 +1,8 @@
 from heutagogy import app
 from flask_sqlalchemy import SQLAlchemy
 import datetime
-import bcrypt
-
 
 db = SQLAlchemy(app)
-
-
-class User(db.Model):
-    id = db.Column(db.String, primary_key=True)
-    username = db.Column(db.String, unique=True)
-    email = db.Column(db.String, unique=True)
-    password = db.Column(db.String)
-
-    def __init__(self, username, email, password):
-        self.id = username
-        self.username = username
-        self.email = email
-        self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-
-    def check_password(self, password):
-        return bcrypt.checkpw(password.encode(), self.password)
-
-    def __str__(self):
-        return "User(%s)" % self.username
-
-    def __getitem__(self, key):
-        return {
-            'id': self.id,
-            'username': self.username,
-            'email': self.email,
-            'password': self.password,
-        }.get(key, None)
 
 
 class Bookmark(db.Model):

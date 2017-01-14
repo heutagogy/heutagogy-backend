@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import heutagogy
-from heutagogy.persistence import db, User
+from heutagogy.persistence import db
+from heutagogy.auth import User
 from http import HTTPStatus
 import unittest
 import json
@@ -13,7 +14,9 @@ def get_json(response):
 
 def single_user(f):
     def wrapper(*args):
-        db.session.add(User('user1', 'random@gmail.com', 'password1'))
+        user1 = User(username='user1', email='random@gmail.com')
+        user1.set_password('password1')
+        db.session.add(user1)
         db.session.commit()
         return f(*args)
     return wrapper
@@ -21,8 +24,12 @@ def single_user(f):
 
 def multiple_users(f):
     def wrapper(*args):
-        db.session.add(User('user1', 'random@gmail.com', 'password1'))
-        db.session.add(User('user2', 'modnar@gmail.com', 'password2'))
+        user1 = User(username='user1', email='random@gmail.com')
+        user1.set_password('password1')
+        user2 = User(username='user2', email='modnar@gmail.com')
+        user2.set_password('password2')
+        db.session.add(user1)
+        db.session.add(user2)
         db.session.commit()
         return f(*args)
     return wrapper
@@ -87,10 +94,9 @@ class HeutagogyTestCase(unittest.TestCase):
             '/api/v1/bookmarks',
             content_type='application/json',
             data=json.dumps({'url': 'https://github.com/'}))
-        result = get_json(res)
 
         self.assertEqual(401, res.status_code)
-        self.assertEqual('Authorization Required', result['error'])
+        self.assertEqual('Authorization Required', get_json(res)['error'])
 
     def test_get_bookmark_requires_authorization(self):
         res = self.app.get('/api/v1/bookmarks')
@@ -409,24 +415,3 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.BAD_REQUEST, res.status_code)
         self.assertEqual({'error': 'Updating id is not allowed'},
                          get_json(res))
-
-    def test_create_user(self):
-        res = self.app.post(
-            '/api/v1/users',
-            content_type='application/json',
-            data=json.dumps({'username': 'bob',
-                             'password': 'topsecret'}))
-        self.assertEqual(HTTPStatus.CREATED, res.status_code)
-
-        res = self.app.post(
-            '/api/v1/login',
-            content_type='application/json',
-            data=json.dumps({
-                'username': 'bob',
-                'password': 'topsecret',
-            }))
-        self.assertEqual(HTTPStatus.OK, res.status_code)
-
-
-if __name__ == '__main__':
-    unittest.main()
