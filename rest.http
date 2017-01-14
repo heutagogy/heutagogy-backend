@@ -11,15 +11,6 @@
 :host = 127.0.0.1:5000
 :url = http://:host/api/v1
 
-# Register user
-POST :url/users
-Content-Type: application/json
-
-{
-  "username": :username,
-  "password": :password
-}
-
 # Get auth token
 POST :url/login
 Content-Type: application/json

@@ -1,7 +1,8 @@
 from heutagogy import app
 import heutagogy.persistence as db
+from heutagogy.auth import token_required
 
-from flask_login import login_required, current_user
+from flask_user import current_user
 from flask import request
 from flask_restful import Resource, Api
 
@@ -25,13 +26,13 @@ def after_request(response):
 
 
 class Bookmarks(Resource):
-    @login_required
+    @token_required
     def get(self):
         current_user_id = current_user.id
         result = db.Bookmark.query.filter_by(user=current_user_id)
         return list(map(lambda x: x.to_dict(), result))
 
-    @login_required
+    @token_required
     def post(self):
         r = request.get_json()
 
@@ -67,7 +68,7 @@ class Bookmarks(Resource):
 
 
 class Bookmark(Resource):
-    @login_required
+    @token_required
     def get(self, id):
         current_user_id = current_user.id
         bookmark = db.Bookmark.query \
@@ -77,7 +78,7 @@ class Bookmark(Resource):
             return {'error': 'Not found'}, HTTPStatus.NOT_FOUND
         return bookmark.to_dict()
 
-    @login_required
+    @token_required
     def post(self, id):
         update = request.get_json()
         if 'id' in update:
@@ -106,24 +107,5 @@ class Bookmark(Resource):
         return bookmark.to_dict(), HTTPStatus.OK
 
 
-class Users(Resource):
-    def post(self):
-        user = request.get_json()
-        if 'username' not in user:
-            return {'error': "'username' field is mandatory"}, \
-                HTTPStatus.BAD_REQUEST
-        if 'password' not in user:
-            return {'error': "'password' field is mandatory"}, \
-                HTTPStatus.BAD_REQUEST
-
-        db.db.session.add(db.User(user['username'],
-                                  user.get('email', None),
-                                  user['password']))
-        db.db.session.commit()
-
-        return user['username'], HTTPStatus.CREATED
-
-
 api.add_resource(Bookmarks, '/api/v1/bookmarks')
 api.add_resource(Bookmark,  '/api/v1/bookmarks/<int:id>')
-api.add_resource(Users,     '/api/v1/users')
