@@ -4,6 +4,8 @@ import heutagogy.persistence as db
 from flask_login import login_required, current_user
 from flask import request
 from flask_restful import Resource, Api
+
+from http import HTTPStatus
 import datetime
 import aniso8601
 
@@ -34,7 +36,7 @@ class Bookmarks(Resource):
         r = request.get_json()
 
         if not r:
-            return {'error': 'payload is mandatory'}, 400
+            return {'error': 'payload is mandatory'}, HTTPStatus.BAD_REQUEST
 
         if isinstance(r, dict):
             r = [r]
@@ -45,7 +47,8 @@ class Bookmarks(Resource):
 
         for entity in r:
             if 'url' not in entity:
-                return {'error': 'url field is mandatory'}, 400
+                return {'error': 'url field is mandatory'}, \
+                    HTTPStatus.BAD_REQUEST
 
             bookmarks.append(db.Bookmark(
                 user=current_user_id,
@@ -60,7 +63,7 @@ class Bookmarks(Resource):
         db.db.session.commit()
 
         res = list(map(lambda x: x.to_dict(), bookmarks))
-        return res[0] if len(res) == 1 else res, 201
+        return res[0] if len(res) == 1 else res, HTTPStatus.CREATED
 
 
 class Bookmark(Resource):
@@ -71,21 +74,22 @@ class Bookmark(Resource):
                               .filter_by(id=id, user=current_user_id) \
                               .first()
         if bookmark is None:
-            return {'error': 'Not found'}, 404
+            return {'error': 'Not found'}, HTTPStatus.NOT_FOUND
         return bookmark.to_dict()
 
     @login_required
     def post(self, id):
         update = request.get_json()
         if 'id' in update:
-            return {'error': 'Updating id is not allowed'}, 400
+            return {'error': 'Updating id is not allowed'}, \
+                HTTPStatus.BAD_REQUEST
 
         current_user_id = current_user.id
         bookmark = db.Bookmark.query \
                               .filter_by(id=id, user=current_user_id) \
                               .first()
         if bookmark is None:
-            return {'error': 'Not found'}, 404
+            return {'error': 'Not found'}, HTTPStatus.NOT_FOUND
 
         if 'url' in update:
             bookmark.url = update['url']
@@ -99,23 +103,25 @@ class Bookmark(Resource):
         db.db.session.add(bookmark)
         db.db.session.commit()
 
-        return bookmark.to_dict(), 200
+        return bookmark.to_dict(), HTTPStatus.OK
 
 
 class Users(Resource):
     def post(self):
         user = request.get_json()
         if 'username' not in user:
-            return {'error': "'username' field is mandatory"}, 400
+            return {'error': "'username' field is mandatory"}, \
+                HTTPStatus.BAD_REQUEST
         if 'password' not in user:
-            return {'error': "'password' field is mandatory"}, 400
+            return {'error': "'password' field is mandatory"}, \
+                HTTPStatus.BAD_REQUEST
 
         db.db.session.add(db.User(user['username'],
                                   user.get('email', None),
                                   user['password']))
         db.db.session.commit()
 
-        return None, 201
+        return user['username'], HTTPStatus.CREATED
 
 
 api.add_resource(Bookmarks, '/api/v1/bookmarks')
