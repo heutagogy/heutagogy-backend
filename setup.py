@@ -13,6 +13,7 @@ setup(
         'Flask-Login',
         'Flask-RESTful',
         'Flask-SQLAlchemy',
+        'Flask-User',
         'bcrypt',
     ],
 )
