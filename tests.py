@@ -10,6 +10,23 @@ def get_json(response):
     return json.loads(response.get_data().decode())
 
 
+def single_user(f):
+    def wrapper(*args):
+        db.session.add(User('user1', 'random@gmail.com', 'password1'))
+        db.session.commit()
+        return f(*args)
+    return wrapper
+
+
+def multiple_users(f):
+    def wrapper(*args):
+        db.session.add(User('user1', 'random@gmail.com', 'password1'))
+        db.session.add(User('user2', 'modnar@gmail.com', 'password2'))
+        db.session.commit()
+        return f(*args)
+    return wrapper
+
+
 class HeutagogyTestCase(unittest.TestCase):
 
     def authorization(self, username, password):
@@ -34,18 +51,24 @@ class HeutagogyTestCase(unittest.TestCase):
 
         db.create_all()
 
-        db.session.add(User('user1', 'random@gmail.com', 'password1'))
-        db.session.add(User('user2', 'modnar@gmail.com', 'password2'))
-        db.session.commit()
-
         self.app = heutagogy.app.test_client()
 
-        self.user1 = self.authorization('user1', 'password1')
-        self.user2 = self.authorization('user2', 'password2')
+    @property
+    def user1(self):
+        if not hasattr(self, '_user1'):
+            self._user1 = self.authorization('user1', 'password1')
+        return self._user1
+
+    @property
+    def user2(self):
+        if not hasattr(self, '_user2'):
+            self._user2 = self.authorization('user2', 'password2')
+        return self._user2
 
     def tearDown(self):
         db.drop_all()
 
+    @single_user
     def test_post_bookmark(self):
         res = self.app.post(
             '/api/v1/bookmarks',
@@ -72,6 +95,7 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.get('/api/v1/bookmarks')
         self.assertEqual(401, res.status_code)
 
+    @single_user
     def test_get_bookmark_returns_nothing(self):
         res = self.app.get('/api/v1/bookmarks',
                            headers=[self.user1])
@@ -80,6 +104,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(200, res.status_code)
         self.assertEqual([], result)
 
+    @single_user
     def test_post_get_bookmark(self):
         bookmark = {
             'url': 'https://github.com/',
@@ -99,6 +124,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(200, res.status_code)
         self.assertEqual([dict(bookmark, id=1, read=False)], result)
 
+    @single_user
     def test_new_bookmark_post_is_unread(self):
         bookmark = {
             'url': 'https://github.com/',
@@ -113,6 +139,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(201, res.status_code)
         self.assertFalse(result['read'])
 
+    @single_user
     def test_new_bookmark_read_is_unread(self):
         bookmark = {
             'url': 'https://github.com/',
@@ -135,6 +162,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(200, res.status_code)
         self.assertFalse(result['read'])
 
+    @single_user
     def test_mark_as_read(self):
         bookmark = {
             'url': 'https://github.com/',
@@ -158,6 +186,7 @@ class HeutagogyTestCase(unittest.TestCase):
         result = get_json(res)
         self.assertTrue(result['read'])
 
+    @single_user
     def test_mark_as_read_updates_read(self):
         bookmark = {
             'url': 'https://github.com/',
@@ -183,10 +212,12 @@ class HeutagogyTestCase(unittest.TestCase):
         result = get_json(res)
         self.assertTrue(result['read'])
 
+    @single_user
     def test_wrong_pass(self):
         token = self.authorization('user1', 'wrongpass')
         self.assertIsNone(token)
 
+    @single_user
     def test_invalid_token(self):
         res = self.app.post(
             '/api/v1/bookmarks',
@@ -203,12 +234,14 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(401, res.status_code)
         self.assertEqual('Invalid token', result['error'])
 
+    @multiple_users
     def test_second_user_auth(self):
         res = self.app.get(
             '/api/v1/bookmarks',
             headers=[self.user2])
         self.assertEqual(200, res.status_code)
 
+    @multiple_users
     def test_user_doesnt_see_other_bookmarks(self):
         res = self.app.post(
             '/api/v1/bookmarks',
@@ -224,6 +257,7 @@ class HeutagogyTestCase(unittest.TestCase):
 
         self.assertEqual([], get_json(res))
 
+    @multiple_users
     def test_user_cant_read_other_bookmarks_directly(self):
         res = self.app.post(
             '/api/v1/bookmarks',
@@ -238,6 +272,7 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user2])
         self.assertEqual(404, res.status_code)
 
+    @multiple_users
     def test_user_change_read_status_for_other_user_bookmarks(self):
         res = self.app.post(
             '/api/v1/bookmarks',
@@ -261,6 +296,7 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user1])
         self.assertFalse(get_json(res)['read'])
 
+    @single_user
     def test_new_bookmark_requires_url(self):
         bookmark = {
             'title': 'no url',
@@ -274,6 +310,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual({'error': 'url field is mandatory'},
                          get_json(res))
 
+    @single_user
     def test_update_bookmark(self):
         res = self.app.post(
             'api/v1/bookmarks',
@@ -302,6 +339,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual('https://github.com/', bookmark['url'])
         self.assertEqual('GitHub', bookmark['title'])
 
+    @single_user
     def test_post_bookmarks(self):
         res = self.app.post(
             '/api/v1/bookmarks',
@@ -333,6 +371,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(res.headers['Access-Control-Allow-Headers'],
                          'authorization, content-type')
 
+    @single_user
     def test_get_nonexistent_bookmark(self):
         res = self.app.get(
             'api/v1/bookmarks/1',
@@ -340,6 +379,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(404, res.status_code)
         self.assertEqual({'error': 'Not found'}, get_json(res))
 
+    @single_user
     def test_post_nonexistent_bookmark(self):
         res = self.app.post(
             'api/v1/bookmarks/1',
@@ -349,6 +389,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(404, res.status_code)
         self.assertEqual({'error': 'Not found'}, get_json(res))
 
+    @single_user
     def test_updating_id_is_error(self):
         res = self.app.post(
             '/api/v1/bookmarks',
