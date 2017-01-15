@@ -9,6 +9,7 @@ app.config.update(dict(
     JWT_EXPIRATION_DELTA=timedelta(seconds=2592000),  # 1 month
 
     # Flask-Mail settings
+    USER_ENABLE_EMAIL=int(os.getenv('USER_ENABLE_EMAIL', False)),
     MAIL_USERNAME=os.getenv('MAIL_USERNAME', 'username'),
     MAIL_PASSWORD=os.getenv('MAIL_PASSWORD', 'password'),
     MAIL_DEFAULT_SENDER=os.getenv('MAIL_DEFAULT_SENDER',
@@ -27,4 +28,5 @@ if not app.config['SECRET_KEY']:
     app.config['SECRET_KEY'] = 'super-secret'
 
 
-mail = Mail(app)
+if app.config['USER_ENABLE_EMAIL']:
+    mail = Mail(app)
