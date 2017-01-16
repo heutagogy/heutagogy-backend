@@ -15,7 +15,6 @@ in python.mkDerivation {
     python.packages.Flask-RESTful
     python.packages.Flask-SQLAlchemy
     python.packages.Flask-User
-    python.packages.bcrypt
   ];
 
   checkPhase = ''
