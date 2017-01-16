@@ -84,7 +84,7 @@ def token_required(f):
     token. We don't want to use default @login_required provided by
     Flask-User as it redirects to login page. We don't want this to
     happen for our API methods and want to return proper 401
-    Anauthorized response.
+    Unauthorized response.
     """
     def wrapper(*args, **kwargs):
         if not flask_user.access.is_authenticated():
