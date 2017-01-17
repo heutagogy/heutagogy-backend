@@ -51,13 +51,18 @@ class Bookmarks(Resource):
                 return {'error': 'url field is mandatory'}, \
                     HTTPStatus.BAD_REQUEST
 
+            if entity.get('read'):
+                read = aniso8601.parse_datetime(entity.get('read'))
+            else:
+                read = None
+
             bookmarks.append(db.Bookmark(
                 user=current_user_id,
                 url=entity['url'],
                 title=entity.get('title', None),
                 timestamp=aniso8601.parse_datetime(
                     entity.get('timestamp', now)),
-                read=entity.get('read', False)))
+                read=read))
 
         for bookmark in bookmarks:
             db.db.session.add(bookmark)
@@ -99,7 +104,10 @@ class Bookmark(Resource):
         if 'timestamp' in update:
             bookmark.timestamp = aniso8601.parse_datetime(update['timestamp'])
         if 'read' in update:
-            bookmark.read = update['read']
+            if update['read']:
+                bookmark.read = aniso8601.parse_datetime(update['read'])
+            else:
+                bookmark.read = None
 
         db.db.session.add(bookmark)
         db.db.session.commit()
