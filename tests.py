@@ -415,3 +415,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.BAD_REQUEST, res.status_code)
         self.assertEqual({'error': 'Updating id is not allowed'},
                          get_json(res))
+
+
+if __name__ == '__main__':
+    unittest.main()
