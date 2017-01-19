@@ -151,7 +151,6 @@ class HeutagogyTestCase(unittest.TestCase):
         bookmark = {
             'url': 'https://github.com/',
         }
-        read = '2016-11-06T01:31:15'
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
@@ -162,8 +161,6 @@ class HeutagogyTestCase(unittest.TestCase):
 
         res = self.app.get(
             '/api/v1/bookmarks/{}'.format(bookmark_id),
-            content_type='application/json',
-            data=json.dumps({'read': read}),
             headers=[self.user1])
         result = get_json(res)
 
