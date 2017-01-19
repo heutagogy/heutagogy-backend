@@ -129,7 +129,7 @@ class HeutagogyTestCase(unittest.TestCase):
         result = get_json(res)
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
-        self.assertEqual([dict(bookmark, id=1, read=False)], result)
+        self.assertEqual([dict(bookmark, id=1, read=None)], result)
 
     @single_user
     def test_new_bookmark_post_is_unread(self):
@@ -144,13 +144,14 @@ class HeutagogyTestCase(unittest.TestCase):
         result = get_json(res)
 
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
-        self.assertFalse(result['read'])
+        self.assertIsNone(result['read'])
 
     @single_user
     def test_new_bookmark_read_is_unread(self):
         bookmark = {
             'url': 'https://github.com/',
         }
+        read = '2016-11-06T01:31:15'
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
@@ -162,18 +163,19 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.get(
             '/api/v1/bookmarks/{}'.format(bookmark_id),
             content_type='application/json',
-            data=json.dumps({'read': True}),
+            data=json.dumps({'read': read}),
             headers=[self.user1])
         result = get_json(res)
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
-        self.assertFalse(result['read'])
+        self.assertIsNone(result['read'])
 
     @single_user
     def test_mark_as_read(self):
         bookmark = {
             'url': 'https://github.com/',
         }
+        read = '2016-11-06T01:31:15'
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
@@ -186,18 +188,19 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.post(
             '/api/v1/bookmarks/{}'.format(bookmark_id),
             content_type='application/json',
-            data=json.dumps({'read': True}),
+            data=json.dumps({'read': read}),
             headers=[self.user1])
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
         result = get_json(res)
-        self.assertTrue(result['read'])
+        self.assertEqual(read, result['read'])
 
     @single_user
     def test_mark_as_read_updates_read(self):
         bookmark = {
             'url': 'https://github.com/',
         }
+        read = '2016-11-06T01:31:15'
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
@@ -208,7 +211,7 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.post(
             '/api/v1/bookmarks/{}'.format(bookmark_id),
             content_type='application/json',
-            data=json.dumps({'read': True}),
+            data=json.dumps({'read': read}),
             headers=[self.user1])
 
         res = self.app.get(
@@ -217,7 +220,7 @@ class HeutagogyTestCase(unittest.TestCase):
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
         result = get_json(res)
-        self.assertTrue(result['read'])
+        self.assertEqual(read, result['read'])
 
     @single_user
     def test_wrong_pass(self):
@@ -292,7 +295,7 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.post(
             '/api/v1/bookmarks/{}'.format(bookmark_id),
             content_type='application/json',
-            data=json.dumps({'read': True}),
+            data=json.dumps({'read': '2016-11-06T01:31:15'}),
             headers=[self.user2])
         self.assertEqual(HTTPStatus.NOT_FOUND, res.status_code)
         self.assertEqual({'error': 'Not found'},
@@ -301,7 +304,7 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.get(
             '/api/v1/bookmarks/{}'.format(bookmark_id),
             headers=[self.user1])
-        self.assertFalse(get_json(res)['read'])
+        self.assertIsNone(get_json(res)['read'])
 
     @single_user
     def test_new_bookmark_requires_url(self):

@@ -4,5 +4,5 @@ CREATE TABLE bookmarks (
   timestamp text,
   url text not null,
   title text,
-  read bool
+  read text
 );

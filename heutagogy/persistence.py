@@ -11,9 +11,9 @@ class Bookmark(db.Model):
     timestamp = db.Column(db.DateTime)
     url = db.Column(db.String)
     title = db.Column(db.String)
-    read = db.Column(db.Boolean)
+    read = db.Column(db.DateTime)
 
-    def __init__(self, user, url, title=None, timestamp=None, read=False):
+    def __init__(self, user, url, title=None, timestamp=None, read=None):
         if timestamp is None:
             timestamp = datetime.datetime.utcnow()
         if title is None:
@@ -34,7 +34,7 @@ class Bookmark(db.Model):
             'url': self.url,
             'title': self.title,
             'timestamp': self.timestamp.isoformat(),
-            'read': self.read,
+            'read': self.read.isoformat() if self.read else None,
         }
 
 
