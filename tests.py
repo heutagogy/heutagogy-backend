@@ -416,6 +416,17 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual({'error': 'Updating id is not allowed'},
                          get_json(res))
 
+    @single_user
+    def test_handle_timezone(self):
+        res = self.app.post(
+            'api/v1/bookmarks',
+            content_type='application/json',
+            data=json.dumps({'url': 'https://github.com/',
+                             'timestamp': '2017-01-01T01:20:13+0200'}),
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        self.assertEqual('2016-12-31T23:20:13', get_json(res)['timestamp'])
+
 
 if __name__ == '__main__':
     unittest.main()

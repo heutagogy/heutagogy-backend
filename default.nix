@@ -22,4 +22,7 @@ in python.mkDerivation {
 
     flake8 .
   '';
+
+  # This sets FLASK_APP environment variable, so you don't have to.
+  FLASK_APP = "heutagogy";
 }
