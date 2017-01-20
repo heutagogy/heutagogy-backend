@@ -18,5 +18,5 @@ nix-shell
 
 ## Create a database
 ```sh
-env FLASK_APP=heutagogy/heutagogy.py flask initdb
+env FLASK_APP=heutagogy flask initdb
 ```
