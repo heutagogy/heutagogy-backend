@@ -1,8 +1,23 @@
 from heutagogy import app
 from flask_sqlalchemy import SQLAlchemy
 import datetime
+import pytz
 
 db = SQLAlchemy(app)
+
+
+# SQLite doesn't store timezones, so we convert all timestamps to UTC
+# to not save incorrect info.
+def to_utc(t):
+    """Convert datetime to UTC."""
+    if t is None:
+        return t
+
+    if t.tzinfo is None or t.tzinfo.utcoffset(t) is None:
+        # t is naive datetime (not aware of timezone)
+        return t.replace(tzinfo=pytz.utc)
+
+    return t.astimezone(pytz.utc)
 
 
 class Bookmark(db.Model):
@@ -22,8 +37,8 @@ class Bookmark(db.Model):
         self.user = user
         self.url = url
         self.title = title
-        self.timestamp = timestamp
-        self.read = read
+        self.timestamp = to_utc(timestamp)
+        self.read = to_utc(read)
 
     def __repr__(self):
         return '<Bookmark %r of %r>' % self.url % self.user
