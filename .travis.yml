@@ -7,3 +7,11 @@ install:
 script:
   - flake8 .
   - ./tests.py
+
+notifications:
+  webhooks:
+    on_success: change
+    on_failure: always
+    on_start: never
+    urls:
+      - https://webhooks.gitter.im/e/20825e759af1c23acbdd
