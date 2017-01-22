@@ -29,7 +29,8 @@ class Bookmarks(Resource):
     @token_required
     def get(self):
         current_user_id = current_user.id
-        result = db.Bookmark.query.filter_by(user=current_user_id)
+        result = db.Bookmark.query.filter_by(user=current_user_id) \
+                                  .paginate().items
         return list(map(lambda x: x.to_dict(), result))
 
     @token_required
