@@ -6,6 +6,7 @@ in python.mkDerivation {
 
   buildInputs = [
     pkgs.python3Packages.flake8
+    pkgs.python3Packages.psycopg2
   ];
 
   propagatedBuildInputs = [

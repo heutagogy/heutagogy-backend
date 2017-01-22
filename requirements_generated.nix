@@ -1,7 +1,7 @@
 # generated using pypi2nix tool (version: 1.6.0)
 #
 # COMMAND:
-#   pypi2nix -V 3.5 -r requirements.txt -E libffi
+#   pypi2nix -V 3.5 -r requirements.txt -E libffi -E postgresql
 #
 
 { pkgs, python, commonBuildInputs ? [], commonDoCheck ? false }:
@@ -267,7 +267,9 @@ self: {
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/da/04/8048a5075d6e29235bbd6f1ea092a38dbe2630c670e73d4aa923a4e5521c/SQLAlchemy-1.1.5.tar.gz"; sha256 = "68fb40049690e567ebda7b270176f5abf0d53d9fbd515fec4e43326f601119b6"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
-    propagatedBuildInputs = [ ];
+    propagatedBuildInputs = [
+      self."psycopg2"
+    ];
     meta = with pkgs.stdenv.lib; {
       homepage = "";
       license = licenses.mit;
@@ -439,7 +441,7 @@ self: {
 
 
   "passlib" = python.mkDerivation {
-    name = "passlib-1.7.0.post20170122203449";
+    name = "passlib-1.7.0.post20170122223606";
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/c7/9b/e09ca2fa46ad1503071a87a9398b424ceb38ec5fad689cbd235df1321d09/passlib-1.7.0.tar.gz"; sha256 = "0be4f6053357c4ebba5578a065fbdad75a844501d4c6d91d4a3a0c1594c6abed"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
@@ -450,6 +452,21 @@ self: {
       homepage = "";
       license = licenses.bsdOriginal;
       description = "comprehensive password hashing framework supporting over 30 schemes";
+    };
+  };
+
+
+
+  "psycopg2" = python.mkDerivation {
+    name = "psycopg2-2.6.2";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/7b/a8/dc2d50a6f37c157459cd18bab381c8e6134b9381b50fbe969997b2ae7dbc/psycopg2-2.6.2.tar.gz"; sha256 = "70490e12ed9c5c818ecd85d185d363335cc8a8cbf7212e3c185431c79ff8c05c"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.lgpl2;
+      description = "psycopg2 - Python-PostgreSQL Database Adapter";
     };
   };
 

@@ -19,7 +19,8 @@ itsdangerous==0.24
 Jinja2==2.9.4
 Mako==1.0.6
 MarkupSafe==0.23
-passlib==1.7.0.post20170122203449
+passlib==1.7.0.post20170122223606
+psycopg2==2.6.2
 pycparser==2.17
 pycryptodome==3.4.3
 PyJWT==1.4.2
