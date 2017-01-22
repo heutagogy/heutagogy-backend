@@ -427,6 +427,63 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
         self.assertEqual('2016-12-31T23:20:13', get_json(res)['timestamp'])
 
+    @single_user
+    def test_paginate(self):
+        for _ in range(30):
+            res = self.app.post(
+                'api/v1/bookmarks',
+                content_type='application/json',
+                data=json.dumps({'url': 'https://github.com/'}),
+                headers=[self.user1])
+            self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.app.get(
+            'api/v1/bookmarks',
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertEqual(20, len(get_json(res)))
+
+    @single_user
+    def test_paginate_next_page(self):
+        for _ in range(30):
+            res = self.app.post(
+                'api/v1/bookmarks',
+                content_type='application/json',
+                data=json.dumps({'url': 'https://github.com/'}),
+                headers=[self.user1])
+            self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.app.get(
+            'api/v1/bookmarks?page=2',
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertEqual(10, len(get_json(res)))
+
+    @single_user
+    def test_paginate_404_on_unknown_page(self):
+        res = self.app.get('api/v1/bookmarks?page=2', headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.NOT_FOUND, res.status_code)
+
+    @single_user
+    def test_paginate_num_per_page(self):
+        for _ in range(30):
+            res = self.app.post(
+                'api/v1/bookmarks',
+                content_type='application/json',
+                data=json.dumps({'url': 'https://github.com/'}),
+                headers=[self.user1])
+            self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.app.get(
+            'api/v1/bookmarks?per_page=15',
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertEqual(15, len(get_json(res)))
+
 
 if __name__ == '__main__':
     unittest.main()
