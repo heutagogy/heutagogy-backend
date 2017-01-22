@@ -24,9 +24,9 @@ nix-shell
 ```
 
 ## Create a database
-Before starting the server, you need to create the database. This should be done with the following command.
+Before starting the server, you need to create/upgrade the database/schema. This should be done with the following command.
 ```sh
-flask initdb
+flask db upgrade
 ```
 
 ## Debug run
