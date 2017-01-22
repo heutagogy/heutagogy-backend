@@ -21,7 +21,7 @@ in python.mkDerivation {
   checkPhase = ''
     ./tests.py
 
-    flake8 .
+    flake8 . --exclude=migrations
   '';
 
   # This sets FLASK_APP environment variable, so you don't have to.
