@@ -2,7 +2,7 @@
 # See more at: https://github.com/garbas/pypi2nix
 #
 # COMMAND:
-#   pypi2nix -V 3.5 -r requirements.txt -E libffi
+#   pypi2nix -V 3.5 -r requirements.txt -E libffi -E postgresql
 #
 
 { pkgs ? import <nixpkgs> {}
@@ -19,7 +19,7 @@ let
     python = pkgs.python35;
   };
 
-  commonBuildInputs = with pkgs; [ libffi ];
+  commonBuildInputs = with pkgs; [ libffi postgresql ];
   commonDoCheck = false;
 
   withPackages = pkgs':

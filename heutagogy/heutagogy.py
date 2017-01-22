@@ -19,8 +19,9 @@ app.config.update(dict(
     MAIL_USE_SSL=int(os.getenv('MAIL_USE_SSL', True)),
 
     USER_APP_NAME='Heutagogy',
-    SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.root_path,
-                                                        'heutagogy.sqlite3'),
+    SQLALCHEMY_DATABASE_URI=os.getenv(
+        'DATABASE_URL',
+        'sqlite:///' + os.path.join(app.root_path, 'heutagogy.sqlite3')),
     SQLALCHEMY_TRACK_MODIFICATIONS=False))
 app.config.from_envvar('HEUTAGOGY_SETTINGS', silent=True)
 
