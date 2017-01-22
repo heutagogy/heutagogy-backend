@@ -1,7 +1,8 @@
-Flask==0.11.1
 Flask-JWT==0.3.2
 Flask-Login==0.4.0
+Flask-Migrate==2.0.2
 Flask-RESTful==0.3.5
 Flask-SQLAlchemy==2.1
 Flask-User==0.6.11
+Flask==0.11.1
 gunicorn==19.6.0

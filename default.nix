@@ -12,6 +12,7 @@ in python.mkDerivation {
     python.packages.Flask
     python.packages.Flask-JWT
     python.packages.Flask-Login
+    python.packages.Flask-Migrate
     python.packages.Flask-RESTful
     python.packages.Flask-SQLAlchemy
     python.packages.Flask-User
