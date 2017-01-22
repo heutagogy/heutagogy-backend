@@ -12,6 +12,7 @@ in python.mkDerivation {
     python.packages.Flask
     python.packages.Flask-JWT
     python.packages.Flask-Login
+    python.packages.Flask-Migrate
     python.packages.Flask-RESTful
     python.packages.Flask-SQLAlchemy
     python.packages.Flask-User
@@ -20,7 +21,7 @@ in python.mkDerivation {
   checkPhase = ''
     ./tests.py
 
-    flake8 .
+    flake8 . --exclude=migrations
   '';
 
   # This sets FLASK_APP environment variable, so you don't have to.
