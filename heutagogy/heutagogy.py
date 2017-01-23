@@ -2,6 +2,8 @@ from heutagogy import app
 import os
 from datetime import timedelta
 from flask_mail import Mail
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 app.config.from_object(__name__)
 app.config.update(dict(
@@ -31,3 +33,6 @@ if not app.config['SECRET_KEY']:
 
 if app.config['USER_ENABLE_EMAIL']:
     mail = Mail(app)
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)

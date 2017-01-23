@@ -1,11 +1,7 @@
-from heutagogy import app
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from heutagogy import db
+from heutagogy.auth import User
 import datetime
 import pytz
-
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
 
 
 # SQLite doesn't store timezones, so we convert all timestamps to UTC
@@ -24,7 +20,7 @@ def to_utc(t):
 
 class Bookmark(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user = db.Column(db.String, nullable=False)
+    user = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     url = db.Column(db.String, nullable=False)
     title = db.Column(db.String, nullable=False)

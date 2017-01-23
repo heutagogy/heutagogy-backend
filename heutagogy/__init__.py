@@ -2,7 +2,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
-import heutagogy.heutagogy   # noqa
-import heutagogy.persistence # noqa
-import heutagogy.views       # noqa
-import heutagogy.auth        # noqa
+from heutagogy.heutagogy import db # noqa
+import heutagogy.persistence       # noqa
+import heutagogy.views             # noqa
+import heutagogy.auth              # noqa
