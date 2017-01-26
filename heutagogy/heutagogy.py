@@ -10,6 +10,8 @@ app.config.update(dict(
     JWT_AUTH_URL_RULE='/api/v1/login',
     JWT_EXPIRATION_DELTA=timedelta(seconds=2592000),  # 1 month
 
+    SECRET_KEY=os.getenv('SECRET_KEY', 'super-secret'),
+
     # Flask-Mail settings
     USER_ENABLE_EMAIL=int(os.getenv('USER_ENABLE_EMAIL', False)),
     MAIL_USERNAME=os.getenv('MAIL_USERNAME', 'username'),
@@ -26,9 +28,6 @@ app.config.update(dict(
         'sqlite:///' + os.path.join(app.root_path, 'heutagogy.sqlite3')),
     SQLALCHEMY_TRACK_MODIFICATIONS=False))
 app.config.from_envvar('HEUTAGOGY_SETTINGS', silent=True)
-
-if not app.config['SECRET_KEY']:
-    app.config['SECRET_KEY'] = 'super-secret'
 
 
 if app.config['USER_ENABLE_EMAIL']:
