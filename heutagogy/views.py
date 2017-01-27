@@ -28,8 +28,7 @@ def after_request(response):
 class Bookmarks(Resource):
     @token_required
     def get(self):
-        current_user_id = current_user.id
-        result = db.Bookmark.query.filter_by(user=current_user_id) \
+        result = db.Bookmark.query.filter_by(user=current_user.id) \
                                   .paginate().items
         return list(map(lambda x: x.to_dict(), result))
 
@@ -44,7 +43,6 @@ class Bookmarks(Resource):
             r = [r]
 
         bookmarks = []
-        current_user_id = current_user.id
         now = datetime.datetime.utcnow().isoformat()
 
         for entity in r:
@@ -58,7 +56,7 @@ class Bookmarks(Resource):
                 read = None
 
             bookmarks.append(db.Bookmark(
-                user=current_user_id,
+                user=current_user.id,
                 url=entity['url'],
                 title=entity.get('title', None),
                 timestamp=aniso8601.parse_datetime(
@@ -76,9 +74,8 @@ class Bookmarks(Resource):
 class Bookmark(Resource):
     @token_required
     def get(self, id):
-        current_user_id = current_user.id
         bookmark = db.Bookmark.query \
-                              .filter_by(id=id, user=current_user_id) \
+                              .filter_by(id=id, user=current_user.id) \
                               .first()
         if bookmark is None:
             return {'error': 'Not found'}, HTTPStatus.NOT_FOUND
@@ -91,9 +88,8 @@ class Bookmark(Resource):
             return {'error': 'Updating id is not allowed'}, \
                 HTTPStatus.BAD_REQUEST
 
-        current_user_id = current_user.id
         bookmark = db.Bookmark.query \
-                              .filter_by(id=id, user=current_user_id) \
+                              .filter_by(id=id, user=current_user.id) \
                               .first()
         if bookmark is None:
             return {'error': 'Not found'}, HTTPStatus.NOT_FOUND
@@ -117,9 +113,8 @@ class Bookmark(Resource):
 
     @token_required
     def delete(self, id):
-        current_user_id = current_user.id
         bookmark = db.Bookmark.query \
-                              .filter_by(id=id, user=current_user_id) \
+                              .filter_by(id=id, user=current_user.id) \
                               .first()
         if bookmark is None:
             return {'error': 'Not found'}, HTTPStatus.NOT_FOUND
@@ -127,7 +122,7 @@ class Bookmark(Resource):
         db.db.session.delete(bookmark)
         db.db.session.commit()
 
-        return {"id": bookmark.id}, HTTPStatus.OK
+        return (), HTTPStatus.NO_CONTENT
 
 
 api.add_resource(Bookmarks, '/api/v1/bookmarks')

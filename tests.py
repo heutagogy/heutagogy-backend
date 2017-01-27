@@ -76,6 +76,26 @@ class HeutagogyTestCase(unittest.TestCase):
     def tearDown(self):
         db.drop_all()
 
+    def add_bookmark(self, bookmark={'url': 'http://github.com'}, user=None):
+        user = user or self.user1
+        return self.app.post(
+            'api/v1/bookmarks',
+            content_type='application/json',
+            data=json.dumps({'url': 'https://github.com/'}),
+            headers=[user])
+
+    def get_bookmark(self, bookmark_id, user=None):
+        user = user or self.user1
+        return self.app.get(
+            'api/v1/bookmarks/{}'.format(bookmark_id),
+            headers=[user])
+
+    def delete_bookmark(self, bookmark_id, user=None):
+        user = user or self.user1
+        return self.app.delete(
+            'api/v1/bookmarks/{}'.format(bookmark_id),
+            headers=[user])
+
     @single_user
     def test_post_bookmark(self):
         res = self.app.post(
@@ -483,6 +503,39 @@ class HeutagogyTestCase(unittest.TestCase):
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
         self.assertEqual(15, len(get_json(res)))
+
+    @single_user
+    def test_delete_does_delete(self):
+        res = self.add_bookmark()
+        bookmark_id = get_json(res)['id']
+
+        res = self.delete_bookmark(bookmark_id)
+        res = self.get_bookmark(bookmark_id)
+
+        self.assertEqual(HTTPStatus.NOT_FOUND, res.status_code)
+
+    @single_user
+    def test_delete_return_204_no_content(self):
+        res = self.add_bookmark()
+        bookmark_id = get_json(res)['id']
+        res = self.delete_bookmark(bookmark_id)
+
+        self.assertEqual(HTTPStatus.NO_CONTENT, res.status_code)
+        self.assertEqual(b'', res.get_data())
+
+    # IDs are reused after deleting a bookmark
+    # https://github.com/heutagogy/heutagogy-backend/issues/70
+    @unittest.expectedFailure
+    @single_user
+    def test_delete_does_not_reuse_ids(self):
+        res = self.add_bookmark()
+        bookmark_id = get_json(res)['id']
+
+        res = self.delete_bookmark(bookmark_id)
+
+        res = self.add_bookmark()
+
+        self.assertNotEqual(bookmark_id, get_json(res)['id'])
 
 
 if __name__ == '__main__':
