@@ -115,6 +115,20 @@ class Bookmark(Resource):
 
         return bookmark.to_dict(), HTTPStatus.OK
 
+    @token_required
+    def delete(self, id):
+        current_user_id = current_user.id
+        bookmark = db.Bookmark.query \
+                              .filter_by(id=id, user=current_user_id) \
+                              .first()
+        if bookmark is None:
+            return {'error': 'Not found'}, HTTPStatus.NOT_FOUND
+
+        db.db.session.delete(bookmark)
+        db.db.session.commit()
+
+        return {"id": bookmark.id}, HTTPStatus.OK
+
 
 api.add_resource(Bookmarks, '/api/v1/bookmarks')
 api.add_resource(Bookmark,  '/api/v1/bookmarks/<int:id>')
