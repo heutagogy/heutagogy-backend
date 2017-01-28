@@ -300,7 +300,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.NOT_FOUND, res.status_code)
 
     @multiple_users
-    def test_user_change_read_status_for_other_user_bookmarks(self):
+    def test_user_cant_change_read_status_for_other_user_bookmarks(self):
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
