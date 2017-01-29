@@ -28,8 +28,14 @@ def after_request(response):
 class Bookmarks(Resource):
     @token_required
     def get(self):
-        result = db.Bookmark.query.filter_by(user=current_user.id) \
-                                  .paginate().items
+        url = request.args.get('url')
+        if url is None:
+            result = db.Bookmark.query.filter_by(user=current_user.id) \
+                                      .paginate().items
+        else:
+            result = db.Bookmark.query.filter_by(user=current_user.id,
+                                                 url=url) \
+                                      .paginate().items
         return list(map(lambda x: x.to_dict(), result))
 
     @token_required
