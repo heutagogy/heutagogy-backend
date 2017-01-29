@@ -5,6 +5,7 @@ from heutagogy.auth import User
 from http import HTTPStatus
 import unittest
 import json
+from urllib.parse import urlencode
 
 
 def get_json(response):
@@ -81,7 +82,7 @@ class HeutagogyTestCase(unittest.TestCase):
         return self.app.post(
             'api/v1/bookmarks',
             content_type='application/json',
-            data=json.dumps({'url': 'https://github.com/'}),
+            data=json.dumps(bookmark),
             headers=[user])
 
     def get_bookmark(self, bookmark_id, user=None):
@@ -536,6 +537,25 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.add_bookmark()
 
         self.assertNotEqual(bookmark_id, get_json(res)['id'])
+
+    @single_user
+    def test_filter_by_url(self):
+        self.add_bookmark({'url': 'https://heutagogy-frontend.herokuapp.com'})
+        self.add_bookmark({'url': 'https://github.com'})
+        self.add_bookmark({'url': 'https://www.wikipedia.org'})
+        self.add_bookmark(
+            {'url': 'https://github.com/flask-restful/flask-restful'})
+
+        res = self.app.get(
+            'api/v1/bookmarks?{}'.format(
+                urlencode({'url': 'https://github.com'})),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+
+        r = get_json(res)
+        self.assertEqual(1, len(r))
+        self.assertEqual('https://github.com', r[0]['url'])
 
 
 if __name__ == '__main__':

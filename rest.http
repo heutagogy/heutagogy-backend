@@ -72,3 +72,7 @@ Content-Type: application/json
 
 DELETE :url/bookmarks/:id
 Authorization: JWT :token
+
+# Get by url
+GET :url/bookmarks?url=https%3A%2F%2Fgithub.com
+Authorization: JWT :token
