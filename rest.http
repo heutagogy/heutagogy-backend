@@ -65,3 +65,10 @@ Content-Type: application/json
 {
   "url": "https://github.com/heutagogy"
 }
+
+# Delete bookmark
+# Put ↓↓↓ article id to delete
+:id= ???
+
+DELETE :url/bookmarks/:id
+Authorization: JWT :token
