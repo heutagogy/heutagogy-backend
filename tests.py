@@ -557,6 +557,45 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(1, len(r))
         self.assertEqual('https://github.com', r[0]['url'])
 
+    @single_user
+    def test_strip_fragment_on_save(self):
+        res = self.add_bookmark(
+            {'url': 'https://medium.com/some-article#.vlqdq2s5j'})
+
+        self.assertEqual('https://medium.com/some-article',
+                         get_json(res)['url'])
+
+    @single_user
+    def test_strip_fragment_on_search(self):
+        self.add_bookmark(
+            {'url': 'https://medium.com/some-article#.vlqdq2s5j'})
+
+        res = self.app.get(
+            'api/v1/bookmarks?{}'.format(urlencode(
+                {'url': 'https://medium.com/some-article#.yfsxelyhh'})),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+
+        r = get_json(res)
+        self.assertEqual(1, len(r))
+        self.assertEqual('https://medium.com/some-article', r[0]['url'])
+
+    @single_user
+    def test_strip_fragment_on_update(self):
+        res = self.add_bookmark({'url': 'https://medium.com/some-article'})
+        bookmark_id = get_json(res)['id']
+
+        res = self.app.post(
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps(
+                {'url': 'https://medium.com/some-article#.vlqdq2s5j'}),
+            headers=[self.user1])
+
+        self.assertEqual('https://medium.com/some-article',
+                         get_json(res)['url'])
+
 
 if __name__ == '__main__':
     unittest.main()

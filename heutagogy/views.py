@@ -9,6 +9,7 @@ from flask_restful import Resource, Api
 from http import HTTPStatus
 import datetime
 import aniso8601
+from urllib.parse import urldefrag
 
 api = Api(app)
 
@@ -34,7 +35,7 @@ class Bookmarks(Resource):
                                       .paginate().items
         else:
             result = db.Bookmark.query.filter_by(user=current_user.id,
-                                                 url=url) \
+                                                 url=urldefrag(url).url) \
                                       .paginate().items
         return list(map(lambda x: x.to_dict(), result))
 
@@ -63,7 +64,7 @@ class Bookmarks(Resource):
 
             bookmarks.append(db.Bookmark(
                 user=current_user.id,
-                url=entity['url'],
+                url=urldefrag(entity['url']).url,
                 title=entity.get('title', None),
                 timestamp=aniso8601.parse_datetime(
                     entity.get('timestamp', now)),
@@ -101,7 +102,7 @@ class Bookmark(Resource):
             return {'error': 'Not found'}, HTTPStatus.NOT_FOUND
 
         if 'url' in update:
-            bookmark.url = update['url']
+            bookmark.url = urldefrag(update['url']).url
         if 'title' in update:
             bookmark.title = update['title']
         if 'timestamp' in update:
