@@ -4,8 +4,8 @@ import datetime
 import pytz
 
 
-# SQLite doesn't store timezones, so we convert all timestamps to UTC
-# to not save incorrect info.
+# The database doesn't store timezones, so we convert all timestamps
+# to UTC to not save incorrect info.
 def to_utc(t):
     """Convert datetime to UTC."""
     if t is None:
@@ -13,9 +13,9 @@ def to_utc(t):
 
     if t.tzinfo is None or t.tzinfo.utcoffset(t) is None:
         # t is naive datetime (not aware of timezone)
-        return t.replace(tzinfo=pytz.utc)
+        return t
 
-    return t.astimezone(pytz.utc)
+    return t.astimezone(pytz.utc).replace(tzinfo=None)
 
 
 class Bookmark(db.Model):

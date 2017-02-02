@@ -55,7 +55,6 @@ class HeutagogyTestCase(unittest.TestCase):
         return ('Authorization', 'JWT ' + token) if token else None
 
     def setUp(self):
-        heutagogy.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         heutagogy.app.config['TESTING'] = True
 
         db.create_all()
@@ -524,9 +523,6 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.NO_CONTENT, res.status_code)
         self.assertEqual(b'', res.get_data())
 
-    # IDs are reused after deleting a bookmark
-    # https://github.com/heutagogy/heutagogy-backend/issues/70
-    @unittest.expectedFailure
     @single_user
     def test_delete_does_not_reuse_ids(self):
         res = self.add_bookmark()
