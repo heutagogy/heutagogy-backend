@@ -5,7 +5,9 @@ from heutagogy.auth import User
 from http import HTTPStatus
 import unittest
 import json
+import urllib.parse
 from urllib.parse import urlencode
+import link_header as lh
 
 
 def get_json(response):
@@ -34,6 +36,22 @@ def multiple_users(f):
         db.session.commit()
         return f(*args)
     return wrapper
+
+
+def parse_url(url):
+    res = list(urllib.parse.urlparse(url))
+    res[4] = urllib.parse.parse_qs(res[4])
+    return res
+
+
+def parse_link_in_header(link_header):
+    """Parses all links in the link_header.to_py() result. This helps
+making test results deterministic."""
+    def parse_header_link(x):
+        res = list(x)
+        res[0] = parse_url(res[0])
+        return res
+    return list(map(parse_header_link, link_header))
 
 
 class HeutagogyTestCase(unittest.TestCase):
@@ -621,6 +639,44 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(id1, b[1]['id'])
         self.assertEqual(id4, b[2]['id'])
         self.assertEqual(id2, b[3]['id'])
+
+    @single_user
+    def test_bookmarks_return_link_last(self):
+        for _ in range(25):
+            self.add_bookmark()
+
+        res = self.app.get('/api/v1/bookmarks',
+                           headers=[self.user1])
+
+        self.assertTrue('Link' in res.headers)
+        links = lh.parse(res.headers['Link']).to_py()
+        self.assertIn([parse_url('http://localhost/api/v1/bookmarks?page=2'),
+                       [['rel', 'last']]], parse_link_in_header(links))
+
+    @single_user
+    def test_bookmark_return_link_last_with_per_page(self):
+        for _ in range(8):
+            self.add_bookmark()
+
+        res = self.app.get('/api/v1/bookmarks?per_page=3',
+                           headers=[self.user1])
+
+        self.assertTrue('Link' in res.headers)
+        links = lh.parse(res.headers['Link']).to_py()
+        self.assertIn([
+            parse_url('http://localhost/api/v1/bookmarks?page=3&per_page=3'),
+            [['rel', 'last']]
+        ], parse_link_in_header(links))
+
+    @single_user
+    def test_bookmarks_dont_return_link_last_when_on_last(self):
+        for _ in range(25):
+            self.add_bookmark()
+
+        res = self.app.get('/api/v1/bookmarks?page=2',
+                           headers=[self.user1])
+
+        self.assertTrue('Link' not in res.headers)
 
 
 if __name__ == '__main__':
