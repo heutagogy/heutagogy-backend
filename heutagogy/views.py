@@ -30,13 +30,15 @@ class Bookmarks(Resource):
     @token_required
     def get(self):
         url = request.args.get('url')
-        if url is None:
-            result = db.Bookmark.query.filter_by(user=current_user.id) \
-                                      .paginate().items
-        else:
-            result = db.Bookmark.query.filter_by(user=current_user.id,
-                                                 url=urldefrag(url).url) \
-                                      .paginate().items
+
+        filters = dict(user=current_user.id)
+        if url is not None:
+            filters['url'] = urldefrag(url).url
+        result = db.Bookmark.query.filter_by(**filters) \
+                                  .order_by(
+                                      db.Bookmark.read.desc().nullsfirst(),
+                                      db.Bookmark.timestamp.desc()) \
+                                  .paginate().items
         return list(map(lambda x: x.to_dict(), result))
 
     @token_required

@@ -592,6 +592,36 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual('https://medium.com/some-article',
                          get_json(res)['url'])
 
+    @single_user
+    def test_bookmarks_order(self):
+        id1 = get_json(self.add_bookmark({
+            'url': 'http://example3.com',
+            'timestamp': '2017-02-01T11:12:12Z',
+        }))['id']
+        id2 = get_json(self.add_bookmark({
+            'url': 'http://example2.com',
+            'timestamp': '2017-02-01T12:30:05Z',
+            'read': '2017-02-01T13:20:01Z',
+        }))['id']
+        id3 = get_json(self.add_bookmark({
+            'url': 'http://example1.com',
+            'timestamp': '2017-02-01T12:30:05Z',
+        }))['id']
+        id4 = get_json(self.add_bookmark({
+            'url': 'http://example4.com',
+            'timestamp': '2017-01-01T12:11:13Z',
+            'read': '2017-02-01T13:20:02Z',
+        }))['id']
+
+        # should be [3, 1, 4, 2]
+        b = get_json(self.app.get('/api/v1/bookmarks',
+                                  headers=[self.user1]))
+
+        self.assertEqual(id3, b[0]['id'])
+        self.assertEqual(id1, b[1]['id'])
+        self.assertEqual(id4, b[2]['id'])
+        self.assertEqual(id2, b[3]['id'])
+
 
 if __name__ == '__main__':
     unittest.main()
