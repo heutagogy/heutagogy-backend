@@ -1,12 +1,20 @@
 language: python
 python:
   - "3.5"
+services:
+  - postgresql
+env:
+  - DATABASE_URL=postgres://postgres@localhost/heutagogy
+
 install:
   - pip install flake8
   - pip install -r requirements.txt
 script:
   - flake8 . --exclude=migrations
   - ./tests.py
+
+before_script:
+  - psql -c 'create database heutagogy;' -U postgres
 
 notifications:
   webhooks:
