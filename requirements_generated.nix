@@ -199,8 +199,8 @@ self: {
 
 
   "Jinja2" = python.mkDerivation {
-    name = "Jinja2-2.9.4";
-    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/f4/3f/28387a5bbc6883082c16784c6135440b94f9d5938fb156ff579798e18eda/Jinja2-2.9.4.tar.gz"; sha256 = "aab8d8ca9f45624f1e77f2844bf3c144d180e97da8824c2a6d7552ad039b5442"; };
+    name = "Jinja2-2.9.5";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/71/59/d7423bd5e7ddaf3a1ce299ab4490e9044e8dfd195420fc83a24de9e60726/Jinja2-2.9.5.tar.gz"; sha256 = "702a24d992f856fa8d5a7a36db6128198d0c21e1da34448ca236c42e92384825"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
     propagatedBuildInputs = [
@@ -210,6 +210,21 @@ self: {
       homepage = "";
       license = licenses.bsdOriginal;
       description = "A small but fast and easy to use stand-alone template engine written in pure python.";
+    };
+  };
+
+
+
+  "LinkHeader" = python.mkDerivation {
+    name = "LinkHeader-0.4.3";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/27/d4/eb1da743b2dc825e936ef1d9e04356b5701e3a9ea022c7aaffdf4f6b0594/LinkHeader-0.4.3.tar.gz"; sha256 = "7fbbc35c0ba3fbbc530571db7e1c886e7db3d718b29b345848ac9686f21b50c3"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "Parse and format link headers according to RFC 5988 \"Web Linking\"";
     };
   };
 
@@ -441,8 +456,8 @@ self: {
 
 
   "passlib" = python.mkDerivation {
-    name = "passlib-1.7.0.post20170122223606";
-    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/c7/9b/e09ca2fa46ad1503071a87a9398b424ceb38ec5fad689cbd235df1321d09/passlib-1.7.0.tar.gz"; sha256 = "0be4f6053357c4ebba5578a065fbdad75a844501d4c6d91d4a3a0c1594c6abed"; };
+    name = "passlib-1.7.1";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/25/4b/6fbfc66aabb3017cd8c3bd97b37f769d7503ead2899bf76e570eb91270de/passlib-1.7.1.tar.gz"; sha256 = "3d948f64138c25633613f303bcc471126eae67c04d5e3f6b7b8ce6242f8653e0"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
     propagatedBuildInputs = [
@@ -488,8 +503,8 @@ self: {
 
 
   "pycryptodome" = python.mkDerivation {
-    name = "pycryptodome-3.4.3";
-    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/45/ef/4514a01be3d8f5383cd12fc5612ffd8a2508ac7e7ff6bde2da708e71c9a3/pycryptodome-3.4.3.tar.gz"; sha256 = "4b1697b5787afe8e7fd81b96ff4501376f52cb80fc9dd684f6989ea3b69853f4"; };
+    name = "pycryptodome-3.4.4";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/54/c1/4e8412b3d51e0dd26843bd0b16732bdcbe6a9090a415adcc4f50ce848b84/pycryptodome-3.4.4.tar.gz"; sha256 = "e3b44c97e2415a6b86f6487a4ba9df07dbce33db16740852ddc029d05e52ce89"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
     propagatedBuildInputs = [ ];
