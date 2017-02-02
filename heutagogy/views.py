@@ -9,7 +9,9 @@ from flask_restful import Resource, Api
 from http import HTTPStatus
 import datetime
 import aniso8601
+import urllib.parse as urlparse
 from urllib.parse import urldefrag
+import link_header as lh
 
 api = Api(app)
 
@@ -26,6 +28,15 @@ def after_request(response):
     return response
 
 
+def update_query(url, params):
+    """Update query parameters in the url with params"""
+    url_parts = list(urlparse.urlparse(url))
+    query = dict(urlparse.parse_qsl(url_parts[4]))
+    query.update(params)
+    url_parts[4] = urlparse.urlencode(query)
+    return urlparse.urlunparse(url_parts)
+
+
 class Bookmarks(Resource):
     @token_required
     def get(self):
@@ -38,8 +49,16 @@ class Bookmarks(Resource):
                                   .order_by(
                                       db.Bookmark.read.desc().nullsfirst(),
                                       db.Bookmark.timestamp.desc()) \
-                                  .paginate().items
-        return list(map(lambda x: x.to_dict(), result))
+                                  .paginate()
+        headers = {}
+        links = []
+        if result.has_next:
+            last_url = update_query(request.url, {'page': result.pages})
+            links.append(lh.Link(last_url, rel='last'))
+
+        if links:
+            headers['Link'] = lh.format_links(links)
+        return list(map(lambda x: x.to_dict(), result.items)), 200, headers
 
     @token_required
     def post(self):
