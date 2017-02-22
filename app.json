@@ -1,14 +1,18 @@
 {
   "name": "heutagogy-backend",
   "scripts": {
-    "postdeploy": "env FLASK_APP=heutagogy flask db upgrade"
   },
   "env": {
   },
   "formation": {
   },
   "addons": [
-
+    {
+      "plan": "heroku-postgresql",
+      "options": {
+        "version": "9.5"
+      }
+    }
   ],
   "buildpacks": [
     {
