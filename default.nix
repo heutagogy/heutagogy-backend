@@ -19,6 +19,7 @@ in python.mkDerivation {
     python.packages.Flask-SQLAlchemy
     python.packages.Flask-User
     python.packages.LinkHeader
+    python.packages.newspaper3k
   ];
 
   checkPhase = ''

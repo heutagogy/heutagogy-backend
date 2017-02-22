@@ -15,5 +15,6 @@ setup(
         'Flask-SQLAlchemy',
         'Flask-User',
         'bcrypt',
+        'newspaper3k',
     ],
 )
