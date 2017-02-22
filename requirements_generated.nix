@@ -1,7 +1,7 @@
 # generated using pypi2nix tool (version: 1.6.0)
 #
 # COMMAND:
-#   pypi2nix -V 3.5 -r requirements.txt -E libffi -E postgresql
+#   pypi2nix -V 3.5 -r requirements.txt -E libffi -E postgresql -E libxml2 -E libxslt -E zlib -E libjpeg -E pkgconfig
 #
 
 { pkgs, python, commonBuildInputs ? [], commonDoCheck ? false }:
@@ -262,6 +262,23 @@ self: {
 
 
 
+  "Pillow" = python.mkDerivation {
+    name = "Pillow-4.0.0";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/8d/80/eca7a2d1a3c2dafb960f32f844d570de988e609f5fd17de92e1cf6a01b0a/Pillow-4.0.0.tar.gz"; sha256 = "ee26d2d7e7e300f76ba7b796014c04011394d0c4a5ed9a288264a3e443abca50"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."olefile"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = "Standard PIL License";
+      description = "Python Imaging Library (Fork)";
+    };
+  };
+
+
+
   "PyJWT" = python.mkDerivation {
     name = "PyJWT-1.4.2";
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/8f/10/9ce7e91d8ec9d852db6f9f2b076811d9f51ed7b0360602432d95e6ea4feb/PyJWT-1.4.2.tar.gz"; sha256 = "87a831b7a3bfa8351511961469ed0462a769724d4da48a501cb8c96d1e17f570"; };
@@ -272,6 +289,21 @@ self: {
       homepage = "";
       license = licenses.mit;
       description = "JSON Web Token implementation in Python";
+    };
+  };
+
+
+
+  "PyYAML" = python.mkDerivation {
+    name = "PyYAML-3.12";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/4a/85/db5a2df477072b2902b0eb892feb37d88ac635d36245a72a6a69b23b383a/PyYAML-3.12.tar.gz"; sha256 = "592766c6303207a20efc445587778322d7f73b161bd994f227adaa341ba212ab"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.mit;
+      description = "YAML parser and emitter for Python";
     };
   };
 
@@ -378,6 +410,23 @@ self: {
 
 
 
+  "beautifulsoup4" = python.mkDerivation {
+    name = "beautifulsoup4-4.5.3";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/9b/a5/c6fa2d08e6c671103f9508816588e0fb9cec40444e8e72993f3d4c325936/beautifulsoup4-4.5.3.tar.gz"; sha256 = "b21ca09366fa596043578fd4188b052b46634d22059e68dd0077d9ee77e08a3e"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."lxml"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.mit;
+      description = "Screen-scraping library";
+    };
+  };
+
+
+
   "blinker" = python.mkDerivation {
     name = "blinker-1.4";
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/1b/51/e2a9f3b757eb802f61dc1f2b09c8c99f6eb01cf06416c0671253536517b6/blinker-1.4.tar.gz"; sha256 = "471aee25f3992bd325afa3772f1063dbdbbca947a041b8b89466dc00d606f8b6"; };
@@ -425,6 +474,55 @@ self: {
 
 
 
+  "cssselect" = python.mkDerivation {
+    name = "cssselect-1.0.1";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/77/ff/9c865275cd19290feba56344eba570e719efb7ca5b34d67ed12b22ebbb0d/cssselect-1.0.1.tar.gz"; sha256 = "73db1c054b9348409e2862fc6c0dde5c4e4fbe4da64c5c5a9e05fbea45744077"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "cssselect parses CSS3 Selectors and translates them to XPath 1.0";
+    };
+  };
+
+
+
+  "feedfinder2" = python.mkDerivation {
+    name = "feedfinder2-0.0.4";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/35/82/1251fefec3bb4b03fd966c7e7f7a41c9fc2bb00d823a34c13f847fd61406/feedfinder2-0.0.4.tar.gz"; sha256 = "3701ee01a6c85f8b865a049c30ba0b4608858c803fe8e30d1d289fdbe89d0efe"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."beautifulsoup4"
+      self."requests"
+      self."six"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.mit;
+      description = "Find the feed URLs for a website.";
+    };
+  };
+
+
+
+  "feedparser" = python.mkDerivation {
+    name = "feedparser-5.2.1";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/91/d8/7d37fec71ff7c9dbcdd80d2b48bcdd86d6af502156fc93846fb0102cb2c4/feedparser-5.2.1.tar.bz2"; sha256 = "ce875495c90ebd74b179855449040003a1beb40cd13d5f037a0654251e260b02"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = "License :: OSI Approved";
+      description = "Universal feed parser, handles RSS 0.9x, RSS 1.0, RSS 2.0, CDF, Atom 0.3, and Atom 1.0 feeds";
+    };
+  };
+
+
+
   "gunicorn" = python.mkDerivation {
     name = "gunicorn-19.6.0";
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/84/ce/7ea5396efad1cef682bbc4068e72a0276341d9d9d0f501da609fab9fcb80/gunicorn-19.6.0.tar.gz"; sha256 = "813f6916d18a4c8e90efde72f419308b357692f81333cb1125f80013d22fb618"; };
@@ -440,6 +538,21 @@ self: {
 
 
 
+  "idna" = python.mkDerivation {
+    name = "idna-2.2";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/94/fe/efb1cb6f505e1a560b3d080ae6b9fddc11e7c542d694ce4635c49b1ccdcb/idna-2.2.tar.gz"; sha256 = "0ac27740937d86850010e035c6a10a564158a5accddf1aa24df89b0309252426"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "Internationalized Domain Names in Applications (IDNA)";
+    };
+  };
+
+
+
   "itsdangerous" = python.mkDerivation {
     name = "itsdangerous-0.24";
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/dc/b4/a60bcdba945c00f6d608d8975131ab3f25b22f2bcfe1dab221165194b2d4/itsdangerous-0.24.tar.gz"; sha256 = "cbb3fcf8d3e33df861709ecaf89d9e6629cff0a217bc2848f1b41cd30d360519"; };
@@ -450,6 +563,99 @@ self: {
       homepage = "";
       license = licenses.bsdOriginal;
       description = "Various helpers to pass trusted data to untrusted environments and back.";
+    };
+  };
+
+
+
+  "jieba3k" = python.mkDerivation {
+    name = "jieba3k-0.35.1";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/a9/cb/2c8332bcdc14d33b0bedd18ae0a4981a069c3513e445120da3c3f23a8aaa/jieba3k-0.35.1.zip"; sha256 = "980a4f2636b778d312518066be90c7697d410dd5a472385f5afced71a2db1c10"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = "";
+      description = "Chinese Words Segementation Utilities";
+    };
+  };
+
+
+
+  "lxml" = python.mkDerivation {
+    name = "lxml-3.7.2";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/66/45/f11fc376f784c6f2e77ffc7a9d02374ff3ceb07ede8c56f918939409577c/lxml-3.7.2.tar.gz"; sha256 = "59d9176360dbc3919e9d4bfca85c1ca64ab4f4ee00e6f119d7150ba887e3410a"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."beautifulsoup4"
+      self."cssselect"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API.";
+    };
+  };
+
+
+
+  "newspaper3k" = python.mkDerivation {
+    name = "newspaper3k-0.1.9";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/85/66/3166c7fcf2736aaa7f682b4ba1b05d4e89aff9ae346de3116a366f52862d/newspaper3k-0.1.9.tar.gz"; sha256 = "0ac2c1d18e34bbf37c2e41b9b2f241aaefa1da9ba467d27ad0975ff6042016de"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."Pillow"
+      self."PyYAML"
+      self."beautifulsoup4"
+      self."cssselect"
+      self."feedfinder2"
+      self."feedparser"
+      self."jieba3k"
+      self."lxml"
+      self."nltk"
+      self."python-dateutil"
+      self."requests"
+      self."tldextract"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.mit;
+      description = "Simplified python article discovery & extraction.";
+    };
+  };
+
+
+
+  "nltk" = python.mkDerivation {
+    name = "nltk-3.2.2";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/13/ce/cba8bf82c8ab538d444ea4ab6f4eb1d80340c7b737d7a8d1f08b429fccae/nltk-3.2.2.tar.gz"; sha256 = "1b37db344770021c9be3d68f48d1667a8dae6eeff0e502b7bfb01638d288a88e"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."six"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.asl20;
+      description = "Natural Language Toolkit";
+    };
+  };
+
+
+
+  "olefile" = python.mkDerivation {
+    name = "olefile-0.44";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/35/17/c15d41d5a8f8b98cc3df25eb00c5cee76193114c78e5674df6ef4ac92647/olefile-0.44.zip"; sha256 = "61f2ca0cd0aa77279eb943c07f607438edf374096b66332fae1ee64a6f0f73ad"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "Python package to parse, read and write Microsoft OLE2 files (Structured Storage or Compound Document, Microsoft Office) - Improved version of the OleFileIO module from PIL, the Python Image Library.";
     };
   };
 
@@ -564,6 +770,41 @@ self: {
 
 
 
+  "requests" = python.mkDerivation {
+    name = "requests-2.13.0";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/16/09/37b69de7c924d318e51ece1c4ceb679bf93be9d05973bb30c35babd596e2/requests-2.13.0.tar.gz"; sha256 = "5722cd09762faa01276230270ff16af7acf7c5c45d623868d9ba116f15791ce8"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."idna"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.asl20;
+      description = "Python HTTP for Humans.";
+    };
+  };
+
+
+
+  "requests-file" = python.mkDerivation {
+    name = "requests-file-1.4.1";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/d4/6a/3503eaf7b8c8b85fc07485234d914fd264b5e81bbb0c6bdf591ccb09972b/requests-file-1.4.1.tar.gz"; sha256 = "d75823cccd271caa7303304f9f7d44e12db9f77d844491c5ec9bd44af0844ebc"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."requests"
+      self."six"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.asl20;
+      description = "File transport adapter for Requests";
+    };
+  };
+
+
+
   "six" = python.mkDerivation {
     name = "six-1.10.0";
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz"; sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a"; };
@@ -574,6 +815,25 @@ self: {
       homepage = "";
       license = licenses.mit;
       description = "Python 2 and 3 compatibility utilities";
+    };
+  };
+
+
+
+  "tldextract" = python.mkDerivation {
+    name = "tldextract-2.0.2";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/44/db/ab27d3003968f766bff7bde238de418d2b8ddd727c3e56346ffd3ef05e27/tldextract-2.0.2.tar.gz"; sha256 = "3d6050d48803eef7a3e3a92b840f46477761d4423fe90f68e57b420fec7f19ab"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."idna"
+      self."requests"
+      self."requests-file"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "Accurately separate the TLD from the registered domain andsubdomains of a URL, using the Public Suffix List.";
     };
   };
 

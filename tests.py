@@ -94,7 +94,10 @@ class HeutagogyTestCase(unittest.TestCase):
     def tearDown(self):
         db.drop_all()
 
-    def add_bookmark(self, bookmark={'url': 'http://github.com'}, user=None):
+    def add_bookmark(self,
+                     bookmark={'url': 'http://github.com',
+                               'title': 'test title'},
+                     user=None):
         user = user or self.user1
         return self.app.post(
             'api/v1/bookmarks',
@@ -119,7 +122,8 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
-            data=json.dumps({'url': 'https://github.com/'}),
+            data=json.dumps({'url': 'https://github.com/',
+                             'title': 'Sample title'}),
             headers=[self.user1])
         result = get_json(res)
 
@@ -131,7 +135,8 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
-            data=json.dumps({'url': 'https://github.com/'}))
+            data=json.dumps({'url': 'https://github.com/',
+                             'title': 'sample title'}))
 
         self.assertEqual(401, res.status_code)
         self.assertEqual('Authorization Required', get_json(res)['error'])
@@ -173,6 +178,7 @@ class HeutagogyTestCase(unittest.TestCase):
     def test_new_bookmark_post_is_unread(self):
         bookmark = {
             'url': 'https://github.com/',
+            'title': 'Sample title',
         }
         res = self.app.post(
             '/api/v1/bookmarks',
@@ -188,6 +194,7 @@ class HeutagogyTestCase(unittest.TestCase):
     def test_new_bookmark_read_is_unread(self):
         bookmark = {
             'url': 'https://github.com/',
+            'title': 'Sample title',
         }
         res = self.app.post(
             '/api/v1/bookmarks',
@@ -209,6 +216,7 @@ class HeutagogyTestCase(unittest.TestCase):
     def test_mark_as_read(self):
         bookmark = {
             'url': 'https://github.com/',
+            'title': 'Sample title',
         }
         read = '2016-11-06T01:31:15'
         res = self.app.post(
@@ -291,7 +299,8 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
-            data=json.dumps({'url': 'https://github.com/'}),
+            data=json.dumps({'url': 'https://github.com/',
+                             'title': 'Sample title'}),
             headers=[self.user1])
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
 
@@ -307,7 +316,8 @@ class HeutagogyTestCase(unittest.TestCase):
         res = self.app.post(
             '/api/v1/bookmarks',
             content_type='application/json',
-            data=json.dumps({'url': 'https://github.com/'}),
+            data=json.dumps({'url': 'https://github.com/',
+                             'title': 'Sample title'}),
             headers=[self.user1])
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
         bookmark_id = get_json(res)['id']
@@ -319,11 +329,7 @@ class HeutagogyTestCase(unittest.TestCase):
 
     @multiple_users
     def test_user_cant_change_read_status_for_other_user_bookmarks(self):
-        res = self.app.post(
-            '/api/v1/bookmarks',
-            content_type='application/json',
-            data=json.dumps({'url': 'https://github.com/'}),
-            headers=[self.user1])
+        res = self.add_bookmark()
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
         bookmark_id = get_json(res)['id']
 
@@ -357,11 +363,10 @@ class HeutagogyTestCase(unittest.TestCase):
 
     @single_user
     def test_update_bookmark(self):
-        res = self.app.post(
-            'api/v1/bookmarks',
-            content_type='application/json',
-            data=json.dumps({'url': 'https://github.com/'}),
-            headers=[self.user1])
+        res = self.add_bookmark({
+            'url': 'https://github.com/',
+            'title': 'some title',
+        })
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
 
         bookmark_id = get_json(res)['id']
@@ -390,8 +395,10 @@ class HeutagogyTestCase(unittest.TestCase):
             '/api/v1/bookmarks',
             content_type='application/json',
             data=json.dumps([
-                {'url': 'https://github.com/'},
-                {'url': 'http://example.com/'}
+                {'url': 'https://github.com/',
+                 'title': 'GitHub'},
+                {'url': 'http://example.com/',
+                 'title': 'Example'},
             ]),
             headers=[self.user1])
         result = get_json(res)
@@ -436,13 +443,7 @@ class HeutagogyTestCase(unittest.TestCase):
 
     @single_user
     def test_updating_id_is_error(self):
-        res = self.app.post(
-            '/api/v1/bookmarks',
-            content_type='application/json',
-            data=json.dumps([
-                {'url': 'https://github.com/'},
-            ]),
-            headers=[self.user1])
+        res = self.add_bookmark()
         bookmark_id = get_json(res)['id']
 
         res = self.app.post(
@@ -460,6 +461,7 @@ class HeutagogyTestCase(unittest.TestCase):
             'api/v1/bookmarks',
             content_type='application/json',
             data=json.dumps({'url': 'https://github.com/',
+                             'title': 'Sample title',
                              'timestamp': '2017-01-01T01:20:13+0200'}),
             headers=[self.user1])
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
@@ -468,11 +470,7 @@ class HeutagogyTestCase(unittest.TestCase):
     @single_user
     def test_paginate(self):
         for _ in range(30):
-            res = self.app.post(
-                'api/v1/bookmarks',
-                content_type='application/json',
-                data=json.dumps({'url': 'https://github.com/'}),
-                headers=[self.user1])
+            res = self.add_bookmark()
             self.assertEqual(HTTPStatus.CREATED, res.status_code)
 
         res = self.app.get(
@@ -485,11 +483,7 @@ class HeutagogyTestCase(unittest.TestCase):
     @single_user
     def test_paginate_next_page(self):
         for _ in range(30):
-            res = self.app.post(
-                'api/v1/bookmarks',
-                content_type='application/json',
-                data=json.dumps({'url': 'https://github.com/'}),
-                headers=[self.user1])
+            res = self.add_bookmark()
             self.assertEqual(HTTPStatus.CREATED, res.status_code)
 
         res = self.app.get(
@@ -508,11 +502,7 @@ class HeutagogyTestCase(unittest.TestCase):
     @single_user
     def test_paginate_num_per_page(self):
         for _ in range(30):
-            res = self.app.post(
-                'api/v1/bookmarks',
-                content_type='application/json',
-                data=json.dumps({'url': 'https://github.com/'}),
-                headers=[self.user1])
+            res = self.add_bookmark()
             self.assertEqual(HTTPStatus.CREATED, res.status_code)
 
         res = self.app.get(
@@ -554,11 +544,15 @@ class HeutagogyTestCase(unittest.TestCase):
 
     @single_user
     def test_filter_by_url(self):
-        self.add_bookmark({'url': 'https://heutagogy-frontend.herokuapp.com'})
-        self.add_bookmark({'url': 'https://github.com'})
-        self.add_bookmark({'url': 'https://www.wikipedia.org'})
+        self.add_bookmark({'url': 'https://heutagogy-frontend.herokuapp.com',
+                           'title': 'Heutagogy frontend'})
+        self.add_bookmark({'url': 'https://github.com',
+                           'title': 'GitHub'})
+        self.add_bookmark({'url': 'https://www.wikipedia.org',
+                           'title': 'Wikipedia'})
         self.add_bookmark(
-            {'url': 'https://github.com/flask-restful/flask-restful'})
+            {'url': 'https://github.com/flask-restful/flask-restful',
+             'title': 'Flask-RESTful'})
 
         res = self.app.get(
             'api/v1/bookmarks?{}'.format(
@@ -574,7 +568,8 @@ class HeutagogyTestCase(unittest.TestCase):
     @single_user
     def test_strip_fragment_on_save(self):
         res = self.add_bookmark(
-            {'url': 'https://medium.com/some-article#.vlqdq2s5j'})
+            {'url': 'https://medium.com/some-article#.vlqdq2s5j',
+             'title': 'Some article'})
 
         self.assertEqual('https://medium.com/some-article',
                          get_json(res)['url'])
@@ -582,7 +577,8 @@ class HeutagogyTestCase(unittest.TestCase):
     @single_user
     def test_strip_fragment_on_search(self):
         self.add_bookmark(
-            {'url': 'https://medium.com/some-article#.vlqdq2s5j'})
+            {'url': 'https://medium.com/some-article#.vlqdq2s5j',
+             'title': 'Some article'})
 
         res = self.app.get(
             'api/v1/bookmarks?{}'.format(urlencode(
@@ -597,7 +593,8 @@ class HeutagogyTestCase(unittest.TestCase):
 
     @single_user
     def test_strip_fragment_on_update(self):
-        res = self.add_bookmark({'url': 'https://medium.com/some-article'})
+        res = self.add_bookmark({'url': 'https://medium.com/some-article',
+                                 'title': 'Some article'})
         bookmark_id = get_json(res)['id']
 
         res = self.app.post(
@@ -614,19 +611,23 @@ class HeutagogyTestCase(unittest.TestCase):
     def test_bookmarks_order(self):
         id1 = get_json(self.add_bookmark({
             'url': 'http://example3.com',
+            'title': 'Sample title',
             'timestamp': '2017-02-01T11:12:12Z',
         }))['id']
         id2 = get_json(self.add_bookmark({
             'url': 'http://example2.com',
+            'title': 'Sample title',
             'timestamp': '2017-02-01T12:30:05Z',
             'read': '2017-02-01T13:20:01Z',
         }))['id']
         id3 = get_json(self.add_bookmark({
             'url': 'http://example1.com',
+            'title': 'Sample title',
             'timestamp': '2017-02-01T12:30:05Z',
         }))['id']
         id4 = get_json(self.add_bookmark({
             'url': 'http://example4.com',
+            'title': 'Sample title',
             'timestamp': '2017-01-01T12:11:13Z',
             'read': '2017-02-01T13:20:02Z',
         }))['id']

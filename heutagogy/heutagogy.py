@@ -24,8 +24,7 @@ app.config.update(dict(
 
     USER_APP_NAME='Heutagogy',
     SQLALCHEMY_DATABASE_URI=os.getenv(
-        'DATABASE_URL',
-        'sqlite:///' + os.path.join(app.root_path, 'heutagogy.sqlite3')),
+        'DATABASE_URL', 'postgresql:///heutagogy'),
     SQLALCHEMY_TRACK_MODIFICATIONS=False))
 app.config.from_envvar('HEUTAGOGY_SETTINGS', silent=True)
 
