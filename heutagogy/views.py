@@ -13,7 +13,20 @@ import urllib.parse as urlparse
 from urllib.parse import urldefrag
 import link_header as lh
 
+from newspaper import Article
+
 api = Api(app)
+
+
+def fetch_title(url):
+    """Fetch URL and try to parse its title."""
+    try:
+        article = Article(url)
+        article.download()
+        article.parse()
+        return article.title
+    except:
+        return None
 
 
 @app.after_request
@@ -79,15 +92,22 @@ class Bookmarks(Resource):
                 return {'error': 'url field is mandatory'}, \
                     HTTPStatus.BAD_REQUEST
 
+            url = urldefrag(entity['url']).url
+
             if entity.get('read'):
                 read = aniso8601.parse_datetime(entity.get('read'))
             else:
                 read = None
 
+            if entity.get('title'):
+                title = entity.get('title')
+            else:
+                title = fetch_title(url)
+
             bookmarks.append(db.Bookmark(
                 user=current_user.id,
-                url=urldefrag(entity['url']).url,
-                title=entity.get('title', None),
+                url=url,
+                title=title,
                 timestamp=aniso8601.parse_datetime(
                     entity.get('timestamp', now)),
                 read=read))
