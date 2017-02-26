@@ -22,6 +22,9 @@ app.config.update(dict(
     MAIL_PORT=int(os.getenv('MAIL_PORT', '465')),
     MAIL_USE_SSL=int(os.getenv('MAIL_USE_SSL', True)),
 
+    ACME_CHALLENGE=os.getenv('ACME_CHALLENGE'),
+    ACME_RESPONSE=os.getenv('ACME_RESPONSE'),
+
     USER_APP_NAME='Heutagogy',
     SQLALCHEMY_DATABASE_URI=os.getenv(
         'DATABASE_URL', 'postgresql:///heutagogy'),
