@@ -6,3 +6,4 @@ from heutagogy.heutagogy import db # noqa
 import heutagogy.persistence       # noqa
 import heutagogy.views             # noqa
 import heutagogy.auth              # noqa
+import heutagogy.acme              # noqa
