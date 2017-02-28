@@ -1,6 +1,8 @@
 from heutagogy import app
+from heutagogy.heutagogy import q
 import heutagogy.persistence as db
 from heutagogy.auth import token_required
+import heutagogy.article as article
 
 from flask_user import current_user
 from flask import request
@@ -13,20 +15,7 @@ import urllib.parse as urlparse
 from urllib.parse import urldefrag
 import link_header as lh
 
-from newspaper import Article
-
 api = Api(app)
-
-
-def fetch_title(url):
-    """Fetch URL and try to parse its title."""
-    try:
-        article = Article(url)
-        article.download()
-        article.parse()
-        return article.title
-    except:
-        return None
 
 
 @app.after_request
@@ -101,20 +90,26 @@ class Bookmarks(Resource):
 
             if entity.get('title'):
                 title = entity.get('title')
+                fetch_article = False
             else:
-                title = fetch_title(url)
+                title = entity.get('url')
+                fetch_article = True
 
-            bookmarks.append(db.Bookmark(
+            bookmark = db.Bookmark(
                 user=current_user.id,
                 url=url,
                 title=title,
                 timestamp=aniso8601.parse_datetime(
                     entity.get('timestamp', now)),
-                read=read))
+                read=read)
 
-        for bookmark in bookmarks:
             db.db.session.add(bookmark)
-        db.db.session.commit()
+            db.db.session.commit()
+
+            bookmarks.append(bookmark)
+
+            if fetch_article:
+                q.enqueue(article.fetch_article, bookmark.id, url)
 
         res = list(map(lambda x: x.to_dict(), bookmarks))
         return res[0] if len(res) == 1 else res, HTTPStatus.CREATED

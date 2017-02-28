@@ -4,6 +4,8 @@ from datetime import timedelta
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+import redis
+from rq import Queue
 
 app.config.from_object(__name__)
 app.config.update(dict(
@@ -37,3 +39,5 @@ if app.config['USER_ENABLE_EMAIL']:
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+q = Queue(connection=redis.from_url(os.getenv('REDIS_URL', 'redis://localhost:6379')))
