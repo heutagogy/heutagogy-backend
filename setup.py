@@ -16,5 +16,6 @@ setup(
         'Flask-User',
         'bcrypt',
         'newspaper3k',
+        'rq',
     ],
 )

@@ -2,7 +2,7 @@
 # See more at: https://github.com/garbas/pypi2nix
 #
 # COMMAND:
-#   pypi2nix -V 3.5 -r requirements.txt -E libffi -E postgresql -E libxml2 -E libxslt -E zlib -E libjpeg -E pkgconfig
+#   pypi2nix -V 3.5 -r requirements.txt -E libffi -E postgresql -E libxml2 -E libxslt -E zlib -E libjpeg -E pkgconfig -v
 #
 
 { pkgs ? import <nixpkgs> {}

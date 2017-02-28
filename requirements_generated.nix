@@ -1,7 +1,7 @@
 # generated using pypi2nix tool (version: 1.6.0)
 #
 # COMMAND:
-#   pypi2nix -V 3.5 -r requirements.txt -E libffi -E postgresql -E libxml2 -E libxslt -E zlib -E libjpeg -E pkgconfig
+#   pypi2nix -V 3.5 -r requirements.txt -E libffi -E postgresql -E libxml2 -E libxslt -E zlib -E libjpeg -E pkgconfig -v
 #
 
 { pkgs, python, commonBuildInputs ? [], commonDoCheck ? false }:
@@ -310,8 +310,8 @@ self: {
 
 
   "SQLAlchemy" = python.mkDerivation {
-    name = "SQLAlchemy-1.1.5";
-    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/da/04/8048a5075d6e29235bbd6f1ea092a38dbe2630c670e73d4aa923a4e5521c/SQLAlchemy-1.1.5.tar.gz"; sha256 = "68fb40049690e567ebda7b270176f5abf0d53d9fbd515fec4e43326f601119b6"; };
+    name = "SQLAlchemy-1.1.6";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/24/de/66d96cbad7a91443af1399469e9aa0aec8a41669ba6d0faae8b8411ddb27/SQLAlchemy-1.1.6.tar.gz"; sha256 = "815924e3218d878ddd195d2f9f5bf3d2bb39fabaddb1ea27dace6ac27d9865e4"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
     propagatedBuildInputs = [
@@ -357,8 +357,8 @@ self: {
 
 
   "alembic" = python.mkDerivation {
-    name = "alembic-0.8.10";
-    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/f0/7d/7fcda63887d9726e0145e98802baf374ec8cf889325e469194cd7926c98e/alembic-0.8.10.tar.gz"; sha256 = "0e3b50e96218283ec7443fb661199f5a81f5879f766967a8a2d25e8f9d4e7919"; };
+    name = "alembic-0.9.0";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/84/6e/31f0e7058c82ce177b58e52f927756fca6aea33c8565ad8a9ce42ce144a9/alembic-0.9.0.tar.gz"; sha256 = "d6ccb61fa5abc266fde9c1303d8640498ebc72c7bf8e1591acf6a89a2b1dfa19"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
     propagatedBuildInputs = [
@@ -393,8 +393,8 @@ self: {
 
 
   "bcrypt" = python.mkDerivation {
-    name = "bcrypt-3.1.2";
-    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/4e/af/d276cf4ea4ea5ff1f1ee6382e5fd4193b18b834b206dd73ba6b5b0289a15/bcrypt-3.1.2.tar.gz"; sha256 = "346e175c820a111c17d4c2def181a96e1826652edb0bb16e565085ed542785aa"; };
+    name = "bcrypt-3.1.3";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/58/e9/6d7f1d883d8c5876470b5d187d72c04f2a9954d61e71e7eb5d2ea2a50442/bcrypt-3.1.3.tar.gz"; sha256 = "6645c8d0ad845308de3eb9be98b6fd22a46ec5412bfc664a423e411cdd8f5488"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
     propagatedBuildInputs = [
@@ -539,8 +539,8 @@ self: {
 
 
   "idna" = python.mkDerivation {
-    name = "idna-2.2";
-    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/94/fe/efb1cb6f505e1a560b3d080ae6b9fddc11e7c542d694ce4635c49b1ccdcb/idna-2.2.tar.gz"; sha256 = "0ac27740937d86850010e035c6a10a564158a5accddf1aa24df89b0309252426"; };
+    name = "idna-2.3";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/81/62/c32d933d487d9756f55782de85a70b90cd6827a59a3e330f6adada408241/idna-2.3.tar.gz"; sha256 = "fe077ccaefbcc84b1b1fe8fae9dc0c3b71079df4bf5398796ece0b84be9cbdc3"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
     propagatedBuildInputs = [ ];
@@ -584,8 +584,8 @@ self: {
 
 
   "lxml" = python.mkDerivation {
-    name = "lxml-3.7.2";
-    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/66/45/f11fc376f784c6f2e77ffc7a9d02374ff3ceb07ede8c56f918939409577c/lxml-3.7.2.tar.gz"; sha256 = "59d9176360dbc3919e9d4bfca85c1ca64ab4f4ee00e6f119d7150ba887e3410a"; };
+    name = "lxml-3.7.3";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/39/e8/a8e0b1fa65dd021d48fe21464f71783655f39a41f218293c1c590d54eb82/lxml-3.7.3.tar.gz"; sha256 = "aa502d78a51ee7d127b4824ff96500f0181d3c7826e6ee7b800d068be79361c7"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
     propagatedBuildInputs = [
@@ -709,8 +709,8 @@ self: {
 
 
   "pycryptodome" = python.mkDerivation {
-    name = "pycryptodome-3.4.4";
-    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/54/c1/4e8412b3d51e0dd26843bd0b16732bdcbe6a9090a415adcc4f50ce848b84/pycryptodome-3.4.4.tar.gz"; sha256 = "e3b44c97e2415a6b86f6487a4ba9df07dbce33db16740852ddc029d05e52ce89"; };
+    name = "pycryptodome-3.4.5";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/45/ca/f0c2ca6c65084d60f68553cf072de7db0d918c7bb07ece88781f6af24625/pycryptodome-3.4.5.tar.gz"; sha256 = "be84544eadc2bb71d4ace39e4984ed2990111f053f24267a07afb4b4e1e5428f"; };
     doCheck = commonDoCheck;
     buildInputs = commonBuildInputs;
     propagatedBuildInputs = [ ];
@@ -770,6 +770,21 @@ self: {
 
 
 
+  "redis" = python.mkDerivation {
+    name = "redis-2.10.5";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/68/44/5efe9e98ad83ef5b742ce62a15bea609ed5a0d1caf35b79257ddb324031a/redis-2.10.5.tar.gz"; sha256 = "5dfbae6acfc54edf0a7a415b99e0b21c0a3c27a7f787b292eea727b1facc5533"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [ ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.mit;
+      description = "Python client for Redis key-value store";
+    };
+  };
+
+
+
   "requests" = python.mkDerivation {
     name = "requests-2.13.0";
     src = pkgs.fetchurl { url = "https://pypi.python.org/packages/16/09/37b69de7c924d318e51ece1c4ceb679bf93be9d05973bb30c35babd596e2/requests-2.13.0.tar.gz"; sha256 = "5722cd09762faa01276230270ff16af7acf7c5c45d623868d9ba116f15791ce8"; };
@@ -800,6 +815,24 @@ self: {
       homepage = "";
       license = licenses.asl20;
       description = "File transport adapter for Requests";
+    };
+  };
+
+
+
+  "rq" = python.mkDerivation {
+    name = "rq-0.7.1";
+    src = pkgs.fetchurl { url = "https://pypi.python.org/packages/4a/ee/30024f604d33b18e9e15e5780f20e1dc51a96f1a1162889694939a390593/rq-0.7.1.tar.gz"; sha256 = "b0e98fcfe980cbc7644447d17ea2c177fcbd5c04f1f92d5136c47f00ed2d583d"; };
+    doCheck = commonDoCheck;
+    buildInputs = commonBuildInputs;
+    propagatedBuildInputs = [
+      self."click"
+      self."redis"
+    ];
+    meta = with pkgs.stdenv.lib; {
+      homepage = "";
+      license = licenses.bsdOriginal;
+      description = "RQ is a simple, lightweight, library for creating background jobs, and processing them.";
     };
   };
 

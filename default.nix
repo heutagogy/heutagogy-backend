@@ -20,6 +20,7 @@ in python.mkDerivation {
     python.packages.Flask-User
     python.packages.LinkHeader
     python.packages.newspaper3k
+    python.packages.rq
   ];
 
   checkPhase = ''
