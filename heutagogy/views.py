@@ -7,6 +7,7 @@ import heutagogy.article as article
 from flask_user import current_user
 from flask import request
 from flask_restful import Resource, Api
+import sqlalchemy.orm
 
 from http import HTTPStatus
 import datetime
@@ -90,10 +91,8 @@ class Bookmarks(Resource):
 
             if entity.get('title'):
                 title = entity.get('title')
-                fetch_article = False
             else:
                 title = entity.get('url')
-                fetch_article = True
 
             bookmark = db.Bookmark(
                 user=current_user.id,
@@ -108,8 +107,7 @@ class Bookmarks(Resource):
 
             bookmarks.append(bookmark)
 
-            if fetch_article:
-                q.enqueue(article.fetch_article, bookmark.id, url)
+            q.enqueue(article.fetch_article, bookmark.id, url)
 
         res = list(map(lambda x: x.to_dict(), bookmarks))
         return res[0] if len(res) == 1 else res, HTTPStatus.CREATED
@@ -169,5 +167,18 @@ class Bookmark(Resource):
         return (), HTTPStatus.NO_CONTENT
 
 
-api.add_resource(Bookmarks, '/api/v1/bookmarks')
-api.add_resource(Bookmark,  '/api/v1/bookmarks/<int:id>')
+class BookmarkContent(Resource):
+    @token_required
+    def get(self, id):
+        bookmark = db.Bookmark.query \
+                              .options(sqlalchemy.orm.load_only(
+                                  'content_text', 'content_html')) \
+                              .filter_by(id=id, user=current_user.id) \
+                              .first_or_404()
+
+        return {'html': bookmark.content_html, 'text': bookmark.content_text}
+
+
+api.add_resource(Bookmarks,       '/api/v1/bookmarks')
+api.add_resource(Bookmark,        '/api/v1/bookmarks/<int:id>')
+api.add_resource(BookmarkContent, '/api/v1/bookmarks/<int:id>/content')

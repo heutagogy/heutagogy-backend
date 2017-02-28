@@ -25,6 +25,8 @@ class Bookmark(db.Model):
     url = db.Column(db.String, nullable=False)
     title = db.Column(db.String, nullable=False)
     read = db.Column(db.DateTime)
+    content_html = db.deferred(db.Column(db.Text, nullable=True))
+    content_text = db.deferred(db.Column(db.Text, nullable=True))
 
     def __init__(self, user, url, title=None, timestamp=None, read=None):
         if timestamp is None:

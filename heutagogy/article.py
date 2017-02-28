@@ -4,12 +4,16 @@ from newspaper import Article
 
 
 def fetch_article(id, url):
-    """Fetch URL and try to parse its title."""
-    article = Article(url)
+    article = Article(url, keep_article_html=True)
     article.download()
     article.parse()
 
     bookmark = Bookmark.query.get(id)
-    bookmark.title = article.title
+    if bookmark.title == bookmark.url:
+        # title was not set
+        bookmark.title = article.title
+
+    bookmark.content_html = article.article_html
+    bookmark.content_text = article.text
 
     db.session.commit()
