@@ -3,6 +3,7 @@ python:
   - "3.5"
 services:
   - postgresql
+  - redis-server
 env:
   - DATABASE_URL=postgres://postgres@localhost/heutagogy
 

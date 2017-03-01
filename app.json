@@ -7,6 +7,7 @@
   "formation": {
   },
   "addons": [
+    "heroku-redis",
     {
       "plan": "heroku-postgresql",
       "options": {

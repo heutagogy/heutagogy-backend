@@ -1,10 +1,13 @@
 from heutagogy import app
+from heutagogy.heutagogy import q
 import heutagogy.persistence as db
 from heutagogy.auth import token_required
+import heutagogy.article as article
 
 from flask_user import current_user
 from flask import request
 from flask_restful import Resource, Api
+import sqlalchemy.orm
 
 from http import HTTPStatus
 import datetime
@@ -13,20 +16,7 @@ import urllib.parse as urlparse
 from urllib.parse import urldefrag
 import link_header as lh
 
-from newspaper import Article
-
 api = Api(app)
-
-
-def fetch_title(url):
-    """Fetch URL and try to parse its title."""
-    try:
-        article = Article(url)
-        article.download()
-        article.parse()
-        return article.title
-    except:
-        return None
 
 
 @app.after_request
@@ -102,19 +92,22 @@ class Bookmarks(Resource):
             if entity.get('title'):
                 title = entity.get('title')
             else:
-                title = fetch_title(url)
+                title = entity.get('url')
 
-            bookmarks.append(db.Bookmark(
+            bookmark = db.Bookmark(
                 user=current_user.id,
                 url=url,
                 title=title,
                 timestamp=aniso8601.parse_datetime(
                     entity.get('timestamp', now)),
-                read=read))
+                read=read)
 
-        for bookmark in bookmarks:
             db.db.session.add(bookmark)
-        db.db.session.commit()
+            db.db.session.commit()
+
+            bookmarks.append(bookmark)
+
+            q.enqueue(article.fetch_article, bookmark.id, url)
 
         res = list(map(lambda x: x.to_dict(), bookmarks))
         return res[0] if len(res) == 1 else res, HTTPStatus.CREATED
@@ -174,5 +167,18 @@ class Bookmark(Resource):
         return (), HTTPStatus.NO_CONTENT
 
 
-api.add_resource(Bookmarks, '/api/v1/bookmarks')
-api.add_resource(Bookmark,  '/api/v1/bookmarks/<int:id>')
+class BookmarkContent(Resource):
+    @token_required
+    def get(self, id):
+        bookmark = db.Bookmark.query \
+                              .options(sqlalchemy.orm.load_only(
+                                  'content_text', 'content_html')) \
+                              .filter_by(id=id, user=current_user.id) \
+                              .first_or_404()
+
+        return {'html': bookmark.content_html, 'text': bookmark.content_text}
+
+
+api.add_resource(Bookmarks,       '/api/v1/bookmarks')
+api.add_resource(Bookmark,        '/api/v1/bookmarks/<int:id>')
+api.add_resource(BookmarkContent, '/api/v1/bookmarks/<int:id>/content')
