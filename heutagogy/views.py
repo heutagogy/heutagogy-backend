@@ -5,7 +5,7 @@ from heutagogy.auth import token_required
 import heutagogy.article as article
 
 from flask_user import current_user
-from flask import request
+from flask import request, send_from_directory
 from flask_restful import Resource, Api
 import sqlalchemy.orm
 
@@ -17,6 +17,11 @@ from urllib.parse import urldefrag
 import link_header as lh
 
 api = Api(app)
+
+
+@app.route('/')
+def root():
+    return send_from_directory('public', 'index.html')
 
 
 @app.after_request
