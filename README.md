@@ -2,6 +2,11 @@
 
 The Heutagogy backend is a core of the [Heutagogy project](https://github.com/heutagogy).
 
+## Requirements
+- python3
+- postgresql
+- redis
+
 ## Preparing
 ### Using pip
 Install all necessary build requirements.
@@ -23,7 +28,14 @@ Use the following command to install all necessary dependencies and set environm
 nix-shell
 ```
 
-## Create a database
+## Database setup
+Heutagogy requires Postgresql (for storing user data) and Redis (for work queue) databases to function properly.
+
+The postgresql database configuration is passed via `DATABASE_URL` environment variable, which defaults to `postgresql:///heutagogy` (that is, postgersql database on localhost, database name `heutagogy`).
+
+Redis database configuration is passed via `REDIS_URL` environment variable and defaults to `redis://localhost:6379`.
+
+## Create database tables
 Before starting the server, you need to create/upgrade the database/schema. This should be done with the following command.
 ```sh
 flask db upgrade
