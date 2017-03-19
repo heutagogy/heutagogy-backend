@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='Heutagogy',
-    version='1.0',
+    version='0.1',
     url='https://github.com/heutagogy/heutagogy-backend',
     packages=['heutagogy'],
     license='AGPL3',
