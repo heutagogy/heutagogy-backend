@@ -3,6 +3,8 @@ from heutagogy.auth import User
 import datetime
 import pytz
 
+import sqlalchemy.dialects.postgresql as postgresql
+
 
 # The database doesn't store timezones, so we convert all timestamps
 # to UTC to not save incorrect info.
@@ -25,10 +27,11 @@ class Bookmark(db.Model):
     url = db.Column(db.String, nullable=False)
     title = db.Column(db.String, nullable=False)
     read = db.Column(db.DateTime)
+    tags = db.Column(postgresql.ARRAY(db.Text))
     content_html = db.deferred(db.Column(db.Text, nullable=True))
     content_text = db.deferred(db.Column(db.Text, nullable=True))
 
-    def __init__(self, user, url, title=None, timestamp=None, read=None):
+    def __init__(self, user, url, title=None, timestamp=None, read=None, tags=None):
         if timestamp is None:
             timestamp = datetime.datetime.utcnow()
         if title is None:
@@ -39,6 +42,7 @@ class Bookmark(db.Model):
         self.title = title
         self.timestamp = to_utc(timestamp)
         self.read = to_utc(read)
+        self.tags = tags if tags else []
 
     def __repr__(self):
         return '<Bookmark %r of %r>' % self.url % self.user
@@ -50,4 +54,5 @@ class Bookmark(db.Model):
             'title': self.title,
             'timestamp': self.timestamp.isoformat(),
             'read': self.read.isoformat() if self.read else None,
+            'tags': self.tags,
         }

@@ -50,11 +50,13 @@ class Bookmarks(Resource):
     @token_required
     def get(self):
         url = request.args.get('url')
+        tags = request.args.getlist('tag')
 
-        filters = dict(user=current_user.id)
+        filters = [db.Bookmark.user == current_user.id]
         if url is not None:
-            filters['url'] = urldefrag(url).url
-        result = db.Bookmark.query.filter_by(**filters) \
+            filters.append(db.Bookmark.url == urldefrag(url).url)
+        filters.append(db.Bookmark.tags.contains(tags))
+        result = db.Bookmark.query.filter(*filters) \
                                   .order_by(
                                       db.Bookmark.read.desc().nullsfirst(),
                                       db.Bookmark.timestamp.desc()) \
@@ -99,13 +101,16 @@ class Bookmarks(Resource):
             else:
                 title = entity.get('url')
 
+            tags = entity.get('tags')
+
             bookmark = db.Bookmark(
                 user=current_user.id,
                 url=url,
                 title=title,
                 timestamp=aniso8601.parse_datetime(
                     entity.get('timestamp', now)),
-                read=read)
+                read=read,
+                tags=tags)
 
             db.db.session.add(bookmark)
             db.db.session.commit()
