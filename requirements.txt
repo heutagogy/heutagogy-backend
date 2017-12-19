@@ -3,7 +3,7 @@ Flask-Login==0.4.0
 Flask-Migrate==2.0.2
 Flask-RESTful==0.3.5
 Flask-SQLAlchemy==2.1
-Flask-User==0.6.11
+Flask-User==0.6.19
 Flask==0.11.1
 LinkHeader==0.4.3
 gunicorn==19.6.0
