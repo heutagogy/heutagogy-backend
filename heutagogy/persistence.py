@@ -31,7 +31,10 @@ class Bookmark(db.Model):
     content_html = db.deferred(db.Column(db.Text, nullable=True))
     content_text = db.deferred(db.Column(db.Text, nullable=True))
 
-    def __init__(self, user, url, title=None, timestamp=None, read=None, tags=None):
+    def __init__(
+            self, user, url,
+            title=None, timestamp=None, read=None, tags=None):
+
         if timestamp is None:
             timestamp = datetime.datetime.utcnow()
         if title is None:

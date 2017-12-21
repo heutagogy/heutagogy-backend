@@ -753,5 +753,6 @@ class HeutagogyTestCase(unittest.TestCase):
         result = get_json(res)
         self.assertEqual([dict(bookmark, id=1, read=None)], result)
 
+
 if __name__ == '__main__':
     unittest.main()
