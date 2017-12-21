@@ -172,7 +172,7 @@ class HeutagogyTestCase(unittest.TestCase):
         result = get_json(res)
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
-        self.assertEqual([dict(bookmark, id=1, read=None)], result)
+        self.assertEqual([dict(bookmark, id=1, read=None, tags=[])], result)
 
     @single_user
     def test_new_bookmark_post_is_unread(self):
@@ -678,6 +678,80 @@ class HeutagogyTestCase(unittest.TestCase):
                            headers=[self.user1])
 
         self.assertTrue('Link' not in res.headers)
+
+    @single_user
+    def test_add_bookmark_with_tag(self):
+        bookmark = {
+            'url': 'http://github.com',
+            'title': 'test title',
+            'tags': ['github', 'test'],
+        }
+        res = self.add_bookmark(bookmark)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+    @single_user
+    def test_get_bookmark_with_tag(self):
+        bookmark = {
+            'url': 'http://github.com',
+            'title': 'test title',
+            'timestamp': '2016-11-06T01:31:15',
+            'tags': ['github', 'test'],
+        }
+        res = self.add_bookmark(bookmark)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.app.get(
+            '/api/v1/bookmarks',
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+
+        result = get_json(res)
+        self.assertEqual([dict(bookmark, id=1, read=None)], result)
+
+    @single_user
+    def test_filter_by_tag(self):
+        bookmark = {
+            'url': 'http://github.com',
+            'title': 'test title',
+            'timestamp': '2016-11-06T01:31:15',
+            'tags': ['github', 'test'],
+        }
+        res = self.add_bookmark(bookmark)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark()
+
+        res = self.app.get(
+            '/api/v1/bookmarks?tag=github',
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+
+        result = get_json(res)
+        self.assertEqual([dict(bookmark, id=1, read=None)], result)
+
+    @single_user
+    def test_filter_by_tag_full_match(self):
+        bookmark = {
+            'url': 'http://github.com',
+            'title': 'correct article',
+            'timestamp': '2016-11-06T01:31:15',
+            'tags': ['github', 'test'],
+        }
+        res = self.add_bookmark(bookmark)
+        res = self.add_bookmark({
+            'url': 'http://github.com/rasendubi',
+            'title': 'wrong article',
+            'tags': ['github'],
+        })
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark()
+
+        res = self.app.get(
+            '/api/v1/bookmarks?tag=github&tag=test',
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+
+        result = get_json(res)
+        self.assertEqual([dict(bookmark, id=1, read=None)], result)
 
 
 if __name__ == '__main__':
