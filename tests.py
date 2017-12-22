@@ -755,6 +755,28 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.OK, res.status_code)
         self.assertEqual([dict(bookmark, id=1, read=None)], get_json(res))
 
+    @single_user
+    def test_update_bookmark_tags(self):
+        bookmark = {
+            'url': 'http://github.com',
+            'title': 'test title',
+            'tags': ['github', 'test'],
+        }
+        res = self.add_bookmark(bookmark)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        result = get_json(res)
+        bookmark_id = result['id']
+
+        res = self.app.post(
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps({'tags': ['test']}),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        result = get_json(res)
+        self.assertEqual(['test'], result['tags'])
+
 
 if __name__ == '__main__':
     unittest.main()

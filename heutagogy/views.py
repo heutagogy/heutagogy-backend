@@ -161,6 +161,8 @@ class Bookmark(Resource):
                 bookmark.read = aniso8601.parse_datetime(update['read'])
             else:
                 bookmark.read = None
+        if 'tags' in update:
+            bookmark.tags = update['tags']
 
         db.db.session.add(bookmark)
         db.db.session.commit()
