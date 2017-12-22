@@ -56,7 +56,7 @@ class Bookmarks(Resource):
         if url is not None:
             filters.append(db.Bookmark.url == urldefrag(url).url)
 
-        # If Bookmark.url is null, filtering will yield no results
+        # If Bookmark.tags is null, filtering will yield no results
         if tags:
             filters.append(db.Bookmark.tags.contains(tags))
 
