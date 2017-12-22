@@ -55,7 +55,11 @@ class Bookmarks(Resource):
         filters = [db.Bookmark.user == current_user.id]
         if url is not None:
             filters.append(db.Bookmark.url == urldefrag(url).url)
-        filters.append(db.Bookmark.tags.contains(tags))
+
+        # If Bookmark.url is null, filtering will yield no results
+        if tags:
+            filters.append(db.Bookmark.tags.contains(tags))
+
         result = db.Bookmark.query.filter(*filters) \
                                   .order_by(
                                       db.Bookmark.read.desc().nullsfirst(),
