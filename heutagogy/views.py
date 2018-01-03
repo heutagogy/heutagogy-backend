@@ -107,6 +107,8 @@ class Bookmarks(Resource):
 
             tags = entity.get('tags')
 
+            notes = entity.get('notes')
+
             bookmark = db.Bookmark(
                 user=current_user.id,
                 url=url,
@@ -114,7 +116,8 @@ class Bookmarks(Resource):
                 timestamp=aniso8601.parse_datetime(
                     entity.get('timestamp', now)),
                 read=read,
-                tags=tags)
+                tags=tags,
+                notes=notes)
 
             db.db.session.add(bookmark)
             db.db.session.commit()

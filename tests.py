@@ -172,7 +172,9 @@ class HeutagogyTestCase(unittest.TestCase):
         result = get_json(res)
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
-        self.assertEqual([dict(bookmark, id=1, read=None, tags=[])], result)
+        self.assertEqual([dict(
+            bookmark, id=1, read=None, tags=[], notes=''
+        )], result)
 
     @single_user
     def test_new_bookmark_post_is_unread(self):
@@ -695,6 +697,7 @@ class HeutagogyTestCase(unittest.TestCase):
     def test_get_bookmark_with_tag(self):
         bookmark = {
             'url': 'http://github.com',
+            'notes': 'test notes',
             'title': 'test title',
             'timestamp': '2016-11-06T01:31:15',
             'tags': ['github', 'test'],
@@ -713,6 +716,7 @@ class HeutagogyTestCase(unittest.TestCase):
     def test_filter_by_tag(self):
         bookmark = {
             'url': 'http://github.com',
+            'notes': 'test notes',
             'title': 'test title',
             'timestamp': '2016-11-06T01:31:15',
             'tags': ['github', 'test'],
@@ -734,6 +738,7 @@ class HeutagogyTestCase(unittest.TestCase):
         bookmark = {
             'url': 'http://github.com',
             'title': 'correct article',
+            'notes': 'test notes',
             'timestamp': '2016-11-06T01:31:15',
             'tags': ['github', 'test'],
         }
