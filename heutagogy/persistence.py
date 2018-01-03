@@ -26,6 +26,7 @@ class Bookmark(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False)
     url = db.Column(db.String, nullable=False)
     title = db.Column(db.String, nullable=False)
+    notes = db.Column(db.String, nullable=True)
     read = db.Column(db.DateTime)
     tags = db.Column(postgresql.ARRAY(db.Text))
     content_html = db.deferred(db.Column(db.Text, nullable=True))
@@ -33,7 +34,8 @@ class Bookmark(db.Model):
 
     def __init__(
             self, user, url,
-            title=None, timestamp=None, read=None, tags=None):
+            title=None, timestamp=None, read=None,
+            tags=None, notes=None):
 
         if timestamp is None:
             timestamp = datetime.datetime.utcnow()
@@ -46,6 +48,7 @@ class Bookmark(db.Model):
         self.timestamp = to_utc(timestamp)
         self.read = to_utc(read)
         self.tags = tags if tags else []
+        self.notes = notes if notes else ''
 
     def __repr__(self):
         return '<Bookmark %r of %r>' % self.url % self.user
@@ -58,4 +61,5 @@ class Bookmark(db.Model):
             'timestamp': self.timestamp.isoformat(),
             'read': self.read.isoformat() if self.read else None,
             'tags': self.tags,
+            'notes': self.notes
         }
