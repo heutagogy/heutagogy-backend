@@ -195,6 +195,16 @@ class BookmarkContent(Resource):
         return {'html': bookmark.content_html, 'text': bookmark.content_text}
 
 
+class Tags(Resource):
+    @token_required
+    def get(self):
+        bookmarks = db.Bookmark.query \
+                    .filter(db.Bookmark.user == current_user.id,
+                            db.Bookmark.tags != None).all() # noqa
+        return list(set().union(*map(lambda x: x.tags, bookmarks)))
+
+
 api.add_resource(Bookmarks,       '/api/v1/bookmarks')
 api.add_resource(Bookmark,        '/api/v1/bookmarks/<int:id>')
 api.add_resource(BookmarkContent, '/api/v1/bookmarks/<int:id>/content')
+api.add_resource(Tags,            '/api/v1/tags')

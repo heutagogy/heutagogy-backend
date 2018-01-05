@@ -777,6 +777,45 @@ class HeutagogyTestCase(unittest.TestCase):
         result = get_json(res)
         self.assertEqual(['test'], result['tags'])
 
+    @single_user
+    def test_get_tags(self):
+        res = self.add_bookmark({
+            'url': 'http://github.com',
+            'title': 'test title',
+            'tags': ['github', 'test'],
+        })
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'http://github.com',
+            'title': 'test title',
+            'tags': ['blah', 'test'],
+        })
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'http://github.com',
+            'title': 'test title',
+            'tags': ['hello', 'world'],
+        })
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.app.get(
+            '/api/v1/tags',
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertEqual(sorted(['github', 'test', 'blah', 'hello', 'world']),
+                         sorted(get_json(res)))
+
+    @single_user
+    def test_get_tags_empty(self):
+        res = self.app.get(
+            '/api/v1/tags',
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertEqual(sorted([]),
+                         sorted(get_json(res)))
+
 
 if __name__ == '__main__':
     unittest.main()
