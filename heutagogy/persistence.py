@@ -30,6 +30,7 @@ class Bookmark(db.Model):
     tags = db.Column(postgresql.ARRAY(db.Text))
     content_html = db.deferred(db.Column(db.Text, nullable=True))
     content_text = db.deferred(db.Column(db.Text, nullable=True))
+    notes = db.relationship('Note', back_populates='bookmark')
 
     def __init__(
             self, user, url,
@@ -58,4 +59,23 @@ class Bookmark(db.Model):
             'timestamp': self.timestamp.isoformat(),
             'read': self.read.isoformat() if self.read else None,
             'tags': self.tags,
+            'notes': list(map(lambda x: x.to_dict(), self.notes)),
+        }
+
+
+class Note(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    bookmark_id = db.Column(db.Integer, db.ForeignKey(Bookmark.id),
+                            nullable=False)
+    bookmark = db.relationship('Bookmark', back_populates='notes')
+    text = db.Column(db.Text, nullable=False)
+
+    def __init__(self, bookmark, text):
+        self.bookmark = bookmark
+        self.text = text
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'text': self.text,
         }
