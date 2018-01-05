@@ -160,6 +160,7 @@ class HeutagogyTestCase(unittest.TestCase):
             'url': 'https://github.com/',
             'title': 'GitHub front page',
             'timestamp': '2016-11-06T01:31:15',
+            'notes': [],
         }
         res = self.app.post(
             '/api/v1/bookmarks',
@@ -698,6 +699,7 @@ class HeutagogyTestCase(unittest.TestCase):
             'title': 'test title',
             'timestamp': '2016-11-06T01:31:15',
             'tags': ['github', 'test'],
+            'notes': [],
         }
         res = self.add_bookmark(bookmark)
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
@@ -716,6 +718,7 @@ class HeutagogyTestCase(unittest.TestCase):
             'title': 'test title',
             'timestamp': '2016-11-06T01:31:15',
             'tags': ['github', 'test'],
+            'notes': [],
         }
         res = self.add_bookmark(bookmark)
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
@@ -736,6 +739,7 @@ class HeutagogyTestCase(unittest.TestCase):
             'title': 'correct article',
             'timestamp': '2016-11-06T01:31:15',
             'tags': ['github', 'test'],
+            'notes': [],
         }
         res = self.add_bookmark(bookmark)
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
@@ -815,6 +819,155 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.OK, res.status_code)
         self.assertEqual(sorted([]),
                          sorted(get_json(res)))
+
+    @single_user
+    def test_add_note(self):
+        bookmark = {
+            'url': 'http://github.com',
+            'title': 'test title',
+        }
+        note = {
+            'text': 'test note',
+        }
+        res = self.add_bookmark(bookmark)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        result = get_json(res)
+        bookmark_id = result['id']
+
+        res = self.app.post(
+            '/api/v1/bookmarks/{}/notes'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps(note),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        result = get_json(res)
+        self.assertEqual('test note', result['text'])
+        self.assertIn('id', result)
+
+    @single_user
+    def test_get_added_note(self):
+        bookmark = {
+            'url': 'http://github.com',
+            'title': 'test title',
+        }
+        note = {
+            'text': 'test note',
+        }
+        res = self.add_bookmark(bookmark)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        result = get_json(res)
+        bookmark_id = result['id']
+        res = self.app.post(
+            '/api/v1/bookmarks/{}/notes'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps(note),
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.app.get(
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        result = get_json(res)['notes'][0]
+        self.assertEqual('test note', result['text'])
+        self.assertIn('id', result)
+
+    @single_user
+    def test_get_note_by_id(self):
+        bookmark = {
+            'url': 'http://github.com',
+            'title': 'test title',
+        }
+        note = {
+            'text': 'test note',
+        }
+        res = self.add_bookmark(bookmark)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        result = get_json(res)
+        bookmark_id = result['id']
+        res = self.app.post(
+            '/api/v1/bookmarks/{}/notes'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps(note),
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        note_id = get_json(res)['id']
+        res = self.app.get(
+            '/api/v1/notes/{}'.format(note_id),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        result = get_json(res)
+        self.assertEqual('test note', result['text'])
+        self.assertEqual(note_id, result['id'])
+
+    @single_user
+    def test_update_note_by_id(self):
+        bookmark = {
+            'url': 'http://github.com',
+            'title': 'test title',
+        }
+        note = {
+            'text': 'test note',
+        }
+        res = self.add_bookmark(bookmark)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        result = get_json(res)
+        bookmark_id = result['id']
+        res = self.app.post(
+            '/api/v1/bookmarks/{}/notes'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps(note),
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        note_id = get_json(res)['id']
+        res = self.app.post(
+            '/api/v1/notes/{}'.format(note_id),
+            content_type='application/json',
+            data=json.dumps({'text': 'new text'}),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        result = get_json(res)
+        self.assertEqual('new text', result['text'])
+        self.assertEqual(note_id, result['id'])
+
+    @single_user
+    def test_delete_note_by_id(self):
+        bookmark = {
+            'url': 'http://github.com',
+            'title': 'test title',
+        }
+        note = {
+            'text': 'test note',
+        }
+        res = self.add_bookmark(bookmark)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        result = get_json(res)
+        bookmark_id = result['id']
+        res = self.app.post(
+            '/api/v1/bookmarks/{}/notes'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps(note),
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        note_id = get_json(res)['id']
+        res = self.app.delete(
+            '/api/v1/notes/{}'.format(note_id),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.NO_CONTENT, res.status_code)
+        res = self.app.get(
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        result = get_json(res)
+        self.assertEqual([], result['notes'])
 
 
 if __name__ == '__main__':

@@ -195,6 +195,27 @@ class BookmarkContent(Resource):
         return {'html': bookmark.content_html, 'text': bookmark.content_text}
 
 
+class BookmarkNotes(Resource):
+    @token_required
+    def post(self, id):
+        bookmark = db.Bookmark.query \
+                              .filter_by(id=id, user=current_user.id) \
+                              .first_or_404()
+
+        r = request.get_json()
+        if not r:
+            return {'error': 'payload is mandatory'}, HTTPStatus.BAD_REQUEST
+        if 'text' not in r:
+            return {'error': 'text field is mandatory'}, HTTPStatus.BAD_REQUEST
+
+        note = db.Note(bookmark, r['text'])
+
+        db.db.session.add(note)
+        db.db.session.commit()
+
+        return note.to_dict(), HTTPStatus.CREATED
+
+
 class Tags(Resource):
     @token_required
     def get(self):
@@ -204,7 +225,51 @@ class Tags(Resource):
         return list(set().union(*map(lambda x: x.tags, bookmarks)))
 
 
+class Notes(Resource):
+    @token_required
+    def get(self, id):
+        note = db.Note.query \
+                      .filter_by(id=id) \
+                      .first_or_404()
+        if note.bookmark.user != current_user.id:
+            return {'error': 'Note does not exist'}, HTTPStatus.NOT_FOUND
+
+        return note.to_dict()
+
+    @token_required
+    def post(self, id):
+        note = db.Note.query \
+                      .filter_by(id=id) \
+                      .first()
+        if note is None or note.bookmark.user != current_user.id:
+            return {'error': 'Not found'}, HTTPStatus.NOT_FOUND
+
+        r = request.get_json()
+        if 'text' in r:
+            note.text = r['text']
+
+        db.db.session.add(note)
+        db.db.session.commit()
+
+        return note.to_dict(), HTTPStatus.OK
+
+    @token_required
+    def delete(self, id):
+        note = db.Note.query \
+                      .filter_by(id=id) \
+                      .first()
+        if note is None or note.bookmark.user != current_user.id:
+            return {'error': 'Not found'}, HTTPStatus.NOT_FOUND
+
+        db.db.session.delete(note)
+        db.db.session.commit()
+
+        return (), HTTPStatus.NO_CONTENT
+
+
 api.add_resource(Bookmarks,       '/api/v1/bookmarks')
 api.add_resource(Bookmark,        '/api/v1/bookmarks/<int:id>')
 api.add_resource(BookmarkContent, '/api/v1/bookmarks/<int:id>/content')
+api.add_resource(BookmarkNotes,   '/api/v1/bookmarks/<int:id>/notes')
 api.add_resource(Tags,            '/api/v1/tags')
+api.add_resource(Notes,           '/api/v1/notes/<int:id>')
