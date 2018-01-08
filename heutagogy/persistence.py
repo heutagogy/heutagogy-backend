@@ -21,6 +21,7 @@ def to_utc(t):
 
 
 class Bookmark(db.Model):
+    __tablename__ = 'bookmark'
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
@@ -31,10 +32,14 @@ class Bookmark(db.Model):
     content_html = db.deferred(db.Column(db.Text, nullable=True))
     content_text = db.deferred(db.Column(db.Text, nullable=True))
     notes = db.relationship('Note', back_populates='bookmark')
+    parent_id = db.Column(db.Integer, db.ForeignKey('bookmark.id'))
+    children = db.relationship('Bookmark',
+                               backref=db.backref('parent', remote_side=[id]))
 
     def __init__(
             self, user, url,
-            title=None, timestamp=None, read=None, tags=None):
+            title=None, timestamp=None, read=None, tags=None,
+            parent_id=None):
 
         if timestamp is None:
             timestamp = datetime.datetime.utcnow()
@@ -47,12 +52,13 @@ class Bookmark(db.Model):
         self.timestamp = to_utc(timestamp)
         self.read = to_utc(read)
         self.tags = tags if tags else []
+        self.parent_id = parent_id
 
     def __repr__(self):
         return '<Bookmark %r of %r>' % self.url % self.user
 
     def to_dict(self):
-        return {
+        result = {
             'id': self.id,
             'url': self.url,
             'title': self.title,
@@ -61,6 +67,13 @@ class Bookmark(db.Model):
             'tags': self.tags,
             'notes': list(map(lambda x: x.to_dict(), self.notes)),
         }
+        if self.parent_id is not None:
+            result['parent'] = self.parent_id
+        if self.children:
+            result['children'] = list(map(lambda x: x.to_dict(),
+                                          self.children))
+
+        return result
 
 
 class Note(db.Model):

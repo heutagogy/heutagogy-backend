@@ -107,6 +107,17 @@ class Bookmarks(Resource):
 
             tags = entity.get('tags')
 
+            parent_id = entity.get('parent')
+            if parent_id is not None:
+                parent = db.Bookmark.query \
+                                  .filter_by(id=parent_id,
+                                             user=current_user.id) \
+                                  .first()
+
+                if parent is None:
+                    return {'error': 'parent does not exist'}, \
+                        HTTPStatus.BAD_REQUEST
+
             bookmark = db.Bookmark(
                 user=current_user.id,
                 url=url,
@@ -114,7 +125,8 @@ class Bookmarks(Resource):
                 timestamp=aniso8601.parse_datetime(
                     entity.get('timestamp', now)),
                 read=read,
-                tags=tags)
+                tags=tags,
+                parent_id=parent_id)
 
             db.db.session.add(bookmark)
             db.db.session.commit()
@@ -163,6 +175,18 @@ class Bookmark(Resource):
                 bookmark.read = None
         if 'tags' in update:
             bookmark.tags = update['tags']
+        if 'parent' in update:
+            parent_id = update['parent']
+            if parent_id is not None:
+                parent = db.Bookmark.query \
+                                    .filter_by(id=parent_id,
+                                               user=current_user.id) \
+                                    .first()
+
+                if parent is None:
+                    return {'error': 'parent does not exist'}, \
+                        HTTPStatus.BAD_REQUEST
+            bookmark.parent_id = parent_id
 
         db.db.session.add(bookmark)
         db.db.session.commit()
