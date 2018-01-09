@@ -969,6 +969,57 @@ class HeutagogyTestCase(unittest.TestCase):
         result = get_json(res)
         self.assertEqual([], result['notes'])
 
+    @single_user
+    def test_add_with_parent(self):
+        res = self.add_bookmark()
+        parent_id = get_json(res)['id']
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.add_bookmark({
+            'title': 'GitHub',
+            'url': 'https://github.com',
+            'parent': parent_id,
+        })
+
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        self.assertIn('parent', get_json(res))
+        self.assertEqual(parent_id, get_json(res)['parent'])
+
+    @single_user
+    def test_wrong_parent(self):
+        parent_id = 15
+
+        res = self.add_bookmark({
+            'title': 'GitHub',
+            'url': 'https://github.com',
+            'parent': parent_id,
+        })
+
+        self.assertEqual(HTTPStatus.BAD_REQUEST, res.status_code)
+        self.assertEqual({'error': 'parent does not exist'},
+                         get_json(res))
+
+    @single_user
+    def test_get_children(self):
+        res = self.add_bookmark()
+        parent_id = get_json(res)['id']
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'title': 'GitHub',
+            'url': 'https://github.com',
+            'parent': parent_id,
+        })
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        child_id = get_json(res)['id']
+
+        res = self.get_bookmark(parent_id)
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        r = get_json(res)
+        self.assertIn('children', r)
+        self.assertEqual(1, len(r['children']))
+        self.assertEqual(child_id, r['children'][0]['id'])
+
 
 if __name__ == '__main__':
     unittest.main()
