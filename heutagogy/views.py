@@ -58,6 +58,17 @@ def filter_url(url):
     return u.geturl()
 
 
+def is_child(parent, potential_child):
+    if parent.id == potential_child.id:
+        return True
+
+    for child in parent.children:
+        if is_child(child, potential_child):
+            return True
+
+    return False
+
+
 class Bookmarks(Resource):
     @token_required
     def get(self):
@@ -197,6 +208,10 @@ class Bookmark(Resource):
 
                 if parent is None:
                     return {'error': 'parent does not exist'}, \
+                        HTTPStatus.BAD_REQUEST
+
+                if is_child(bookmark, parent):
+                    return {'error': 'bookmark loops are not allowed'}, \
                         HTTPStatus.BAD_REQUEST
             bookmark.parent_id = parent_id
 

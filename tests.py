@@ -1050,6 +1050,75 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(1, len(get_json(res)))
         self.assertEqual('https://github.com?other=1', get_json(res)[0]['url'])
 
+    @single_user
+    def test_dont_allow_self_loop(self):
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        bookmark_id = get_json(res)['id']
+
+        res = self.app.post(
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps({'parent': bookmark_id}),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.BAD_REQUEST, res.status_code)
+
+    @single_user
+    def test_dont_allow_loops(self):
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        bookmark_id1 = get_json(res)['id']
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        bookmark_id2 = get_json(res)['id']
+
+        res = self.app.post(
+            '/api/v1/bookmarks/{}'.format(bookmark_id1),
+            content_type='application/json',
+            data=json.dumps({'parent': bookmark_id2}),
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        res = self.app.post(
+            '/api/v1/bookmarks/{}'.format(bookmark_id2),
+            content_type='application/json',
+            data=json.dumps({'parent': bookmark_id1}),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.BAD_REQUEST, res.status_code)
+
+    @single_user
+    def test_dont_allow_loops3(self):
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        bookmark_id1 = get_json(res)['id']
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        bookmark_id2 = get_json(res)['id']
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        bookmark_id3 = get_json(res)['id']
+
+        res = self.app.post(
+            '/api/v1/bookmarks/{}'.format(bookmark_id1),
+            content_type='application/json',
+            data=json.dumps({'parent': bookmark_id2}),
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        res = self.app.post(
+            '/api/v1/bookmarks/{}'.format(bookmark_id2),
+            content_type='application/json',
+            data=json.dumps({'parent': bookmark_id3}),
+            headers=[self.user1])
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        res = self.app.post(
+            '/api/v1/bookmarks/{}'.format(bookmark_id3),
+            content_type='application/json',
+            data=json.dumps({'parent': bookmark_id1}),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.BAD_REQUEST, res.status_code)
+
 
 if __name__ == '__main__':
     unittest.main()
