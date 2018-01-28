@@ -1020,6 +1020,36 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(1, len(r['children']))
         self.assertEqual(child_id, r['children'][0]['id'])
 
+    @single_user
+    def test_drop_utm_params(self):
+        bookmark = {
+            'title': 'blah',
+            'url': 'https://github.com?other=1&utm_blah=ignore',
+        }
+
+        res = self.add_bookmark(bookmark)
+
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        self.assertEqual('https://github.com?other=1', get_json(res)['url'])
+
+    @single_user
+    def test_drop_utm_params_on_search(self):
+        bookmark = {
+            'title': 'blah',
+            'url': 'https://github.com?other=1&utm_blah=ignore',
+        }
+        res = self.add_bookmark(bookmark)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.app.get(
+            'api/v1/bookmarks?{}'.format(urlencode(
+                {'url': 'https://github.com?other=1'})),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertEqual(1, len(get_json(res)))
+        self.assertEqual('https://github.com?other=1', get_json(res)[0]['url'])
+
 
 if __name__ == '__main__':
     unittest.main()

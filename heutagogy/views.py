@@ -13,7 +13,6 @@ from http import HTTPStatus
 import datetime
 import aniso8601
 import urllib.parse as urlparse
-from urllib.parse import urldefrag
 import link_header as lh
 
 api = Api(app)
@@ -46,6 +45,19 @@ def update_query(url, params):
     return urlparse.urlunparse(url_parts)
 
 
+def filter_url(url):
+    u = urlparse.urlsplit(url)
+
+    query = sorted([
+        (k, v)
+        for k, v in urlparse.parse_qsl(u.query)
+        if not k.startswith('utm_')])
+
+    u = u._replace(fragment='', query=urlparse.urlencode(query))
+
+    return u.geturl()
+
+
 class Bookmarks(Resource):
     @token_required
     def get(self):
@@ -54,7 +66,7 @@ class Bookmarks(Resource):
 
         filters = [db.Bookmark.user == current_user.id]
         if url is not None:
-            filters.append(db.Bookmark.url == urldefrag(url).url)
+            filters.append(db.Bookmark.url == filter_url(url))
 
         # If Bookmark.tags is null, filtering will yield no results
         if tags:
@@ -93,7 +105,7 @@ class Bookmarks(Resource):
                 return {'error': 'url field is mandatory'}, \
                     HTTPStatus.BAD_REQUEST
 
-            url = urldefrag(entity['url']).url
+            url = filter_url(entity['url'])
 
             if entity.get('read'):
                 read = aniso8601.parse_datetime(entity.get('read'))
@@ -163,7 +175,7 @@ class Bookmark(Resource):
             return {'error': 'Not found'}, HTTPStatus.NOT_FOUND
 
         if 'url' in update:
-            bookmark.url = urldefrag(update['url']).url
+            bookmark.url = filter_url(update['url'])
         if 'title' in update:
             bookmark.title = update['title']
         if 'timestamp' in update:
