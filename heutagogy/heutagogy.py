@@ -9,7 +9,10 @@ from rq import Queue
 
 app.config.from_object(__name__)
 app.config.update(dict(
-    GOOGLE_CLIENT_ID=os.getenv('GOOGLE_CLIENT_ID'),
+    GOOGLE_CLIENT_ID=os.getenv(
+        'GOOGLE_CLIENT_ID',
+        '405142759904-v1f1llvnukvism73kc81kojmhl4k0imm.apps.googleusercontent.com' # noqa
+    ),
 
     JWT_AUTH_URL_RULE=None,
     JWT_EXPIRATION_DELTA=timedelta(seconds=2592000),  # 1 month
