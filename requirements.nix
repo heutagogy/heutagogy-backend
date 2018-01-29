@@ -95,6 +95,23 @@ let
 
 
 
+    "Flask-Compress" = python.mkDerivation {
+      name = "Flask-Compress-1.4.0";
+      src = pkgs.fetchurl { url = "https://pypi.python.org/packages/0e/2a/378bd072928f6d92fd8c417d66b00c757dc361c0405a46a0134de6fd323d/Flask-Compress-1.4.0.tar.gz"; sha256 = "468693f4ddd11ac6a41bca4eb5f94b071b763256d54136f77957cfee635badb3"; };
+      doCheck = commonDoCheck;
+      buildInputs = commonBuildInputs;
+      propagatedBuildInputs = [
+      self."Flask"
+    ];
+      meta = with pkgs.stdenv.lib; {
+        homepage = "https://libwilliam.github.io/flask-compress/";
+        license = licenses.mit;
+        description = "Compress responses in your Flask app with gzip.";
+      };
+    };
+
+
+
     "Flask-JWT" = python.mkDerivation {
       name = "Flask-JWT-0.3.2";
       src = pkgs.fetchurl { url = "https://pypi.python.org/packages/9b/8a/5d3b2e593f1fc5c1b464aa1cbf35023a4400a2b53ce6a52801f68d7a1eeb/Flask-JWT-0.3.2.tar.gz"; sha256 = "49c0672fbde0f1cd3374bd834918d28956e3c521c7e00089cdc5380d323bd0ad"; };

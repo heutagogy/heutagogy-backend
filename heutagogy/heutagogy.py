@@ -4,8 +4,11 @@ from datetime import timedelta
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_compress import Compress
 import redis
 from rq import Queue
+
+Compress(app)
 
 app.config.from_object(__name__)
 app.config.update(dict(

@@ -13,6 +13,7 @@ cssselect==1.0.3
 feedfinder2==0.0.4
 feedparser==5.2.1
 Flask==0.11.1
+Flask-Compress==1.4.0
 Flask-JWT==0.3.2
 Flask-Login==0.4.0
 Flask-Mail==0.9.1
