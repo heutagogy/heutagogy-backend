@@ -112,7 +112,6 @@ def jwt_auth_request_handler():
 
 @jwt.identity_handler
 def identity(payload):
-    print('Identity:', payload)
     user = get_user(payload['identity'])
     return user
 
