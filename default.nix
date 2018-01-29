@@ -11,6 +11,7 @@ in python.mkDerivation {
   ];
 
   propagatedBuildInputs = [
+    python.packages.google-auth
     python.packages.Flask
     python.packages.Flask-JWT
     python.packages.Flask-Login

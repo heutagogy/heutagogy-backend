@@ -9,7 +9,9 @@ from rq import Queue
 
 app.config.from_object(__name__)
 app.config.update(dict(
-    JWT_AUTH_URL_RULE='/api/v1/login',
+    GOOGLE_CLIENT_ID=os.getenv('GOOGLE_CLIENT_ID'),
+
+    JWT_AUTH_URL_RULE=None,
     JWT_EXPIRATION_DELTA=timedelta(seconds=2592000),  # 1 month
 
     SECRET_KEY=os.getenv('SECRET_KEY', 'super-secret'),
