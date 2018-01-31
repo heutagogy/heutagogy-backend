@@ -126,7 +126,7 @@ class Bookmarks(Resource):
             if entity.get('title'):
                 title = entity.get('title')
             else:
-                title = entity.get('url')
+                title = url
 
             tags = entity.get('tags')
 
