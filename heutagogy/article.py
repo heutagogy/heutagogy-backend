@@ -9,7 +9,7 @@ def fetch_article(id, url):
     article.parse()
 
     bookmark = Bookmark.query.get(id)
-    if bookmark.title == bookmark.url:
+    if bookmark.title == bookmark.url and article.title != '':
         # title was not set
         bookmark.title = article.title
 
