@@ -295,7 +295,7 @@ class HeutagogyTestCase(unittest.TestCase):
         bookmark = {
             'url': 'https://github.com/',
         }
-        meta = json.dumps({"pinned": True})
+        meta = json.dumps({"blah": True})
 
         # create bookmark
         res = self.app.post(
