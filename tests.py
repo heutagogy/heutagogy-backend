@@ -216,7 +216,7 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertIsNone(result['read'])
 
     @single_user
-    def test_new_bookmark_read_is_no_meta(self):
+    def test_new_bookmark_no_meta(self):
         bookmark = {
             'url': 'https://github.com/',
             'title': 'Sample title',
