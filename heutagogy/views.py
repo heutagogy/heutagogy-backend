@@ -202,10 +202,6 @@ class Bookmark(Resource):
 
         if 'meta' in update:
             bookmark.meta = update['meta'] if update['meta'] else None
-            if 'pinned' in bookmark.meta:
-                bookmark.meta['pinned'] = str(
-                    aniso8601.parse_datetime(bookmark.meta['pinned'])
-                )
 
         if 'tags' in update:
             bookmark.tags = update['tags']
