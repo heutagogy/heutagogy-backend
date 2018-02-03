@@ -123,6 +123,8 @@ class Bookmarks(Resource):
             else:
                 read = None
 
+            meta = entity.get('meta')
+
             if entity.get('title'):
                 title = entity.get('title')
             else:
@@ -148,6 +150,7 @@ class Bookmarks(Resource):
                 timestamp=aniso8601.parse_datetime(
                     entity.get('timestamp', now)),
                 read=read,
+                meta=meta,
                 tags=tags,
                 parent_id=parent_id)
 
@@ -196,6 +199,10 @@ class Bookmark(Resource):
                 bookmark.read = aniso8601.parse_datetime(update['read'])
             else:
                 bookmark.read = None
+
+        if 'meta' in update:
+            bookmark.meta = update['meta'] if update['meta'] else None
+
         if 'tags' in update:
             bookmark.tags = update['tags']
         if 'parent' in update:

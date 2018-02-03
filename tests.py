@@ -173,7 +173,9 @@ class HeutagogyTestCase(unittest.TestCase):
         result = get_json(res)
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
-        self.assertEqual([dict(bookmark, id=1, read=None, tags=[])], result)
+        self.assertEqual([dict(
+            bookmark, id=1, read=None, meta=None, tags=[]
+        )], result)
 
     @single_user
     def test_new_bookmark_post_is_unread(self):
@@ -212,6 +214,28 @@ class HeutagogyTestCase(unittest.TestCase):
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
         self.assertIsNone(result['read'])
+
+    @single_user
+    def test_new_bookmark_read_is_no_meta(self):
+        bookmark = {
+            'url': 'https://github.com/',
+            'title': 'Sample title',
+        }
+        res = self.app.post(
+            '/api/v1/bookmarks',
+            content_type='application/json',
+            data=json.dumps(bookmark),
+            headers=[self.user1])
+
+        bookmark_id = get_json(res)['id']
+
+        res = self.app.get(
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
+            headers=[self.user1])
+        result = get_json(res)
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertIsNone(result['meta'])
 
     @single_user
     def test_mark_as_read(self):
@@ -265,6 +289,37 @@ class HeutagogyTestCase(unittest.TestCase):
         self.assertEqual(HTTPStatus.OK, res.status_code)
         result = get_json(res)
         self.assertEqual(read, result['read'])
+
+    @single_user
+    def test_update_meta(self):
+        bookmark = {
+            'url': 'https://github.com/',
+        }
+        meta = json.dumps({"pinned": True})
+
+        # create bookmark
+        res = self.app.post(
+            '/api/v1/bookmarks',
+            content_type='application/json',
+            data=json.dumps(bookmark),
+            headers=[self.user1])
+        bookmark_id = get_json(res)['id']
+
+        # update meta
+        res = self.app.post(
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
+            content_type='application/json',
+            data=json.dumps({'meta': meta}),
+            headers=[self.user1])
+
+        # check result
+        res = self.app.get(
+            '/api/v1/bookmarks/{}'.format(bookmark_id),
+            headers=[self.user1])
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        result = get_json(res)
+        self.assertEqual(meta, result['meta'])
 
     @single_user
     def test_wrong_pass(self):
@@ -709,7 +764,9 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user1])
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
-        self.assertEqual([dict(bookmark, id=1, read=None)], get_json(res))
+        self.assertEqual([dict(
+            bookmark, id=1, read=None, meta=None
+        )], get_json(res))
 
     @single_user
     def test_filter_by_tag(self):
@@ -730,7 +787,9 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user1])
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
-        self.assertEqual([dict(bookmark, id=1, read=None)], get_json(res))
+        self.assertEqual([dict(
+            bookmark, id=1, read=None, meta=None
+        )], get_json(res))
 
     @single_user
     def test_filter_by_tag_full_match(self):
@@ -757,7 +816,9 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user1])
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
-        self.assertEqual([dict(bookmark, id=1, read=None)], get_json(res))
+        self.assertEqual([dict(
+            bookmark, id=1, read=None, meta=None
+        )], get_json(res))
 
     @single_user
     def test_update_bookmark_tags(self):

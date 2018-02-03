@@ -28,6 +28,7 @@ class Bookmark(db.Model):
     url = db.Column(db.String, nullable=False)
     title = db.Column(db.String, nullable=False)
     read = db.Column(db.DateTime)
+    meta = db.Column(postgresql.JSON)
     tags = db.Column(postgresql.ARRAY(db.Text))
     content_html = db.deferred(db.Column(db.Text, nullable=True))
     content_text = db.deferred(db.Column(db.Text, nullable=True))
@@ -38,7 +39,8 @@ class Bookmark(db.Model):
 
     def __init__(
             self, user, url,
-            title=None, timestamp=None, read=None, tags=None,
+            title=None, timestamp=None, read=None,
+            meta=None, tags=None,
             parent_id=None):
 
         if timestamp is None:
@@ -51,6 +53,7 @@ class Bookmark(db.Model):
         self.title = title
         self.timestamp = to_utc(timestamp)
         self.read = to_utc(read)
+        self.meta = meta
         self.tags = tags if tags else []
         self.parent_id = parent_id
 
@@ -64,6 +67,7 @@ class Bookmark(db.Model):
             'title': self.title,
             'timestamp': self.timestamp.isoformat(),
             'read': self.read.isoformat() if self.read else None,
+            'meta': self.meta,
             'tags': self.tags,
             'notes': list(map(lambda x: x.to_dict(), self.notes)),
         }
