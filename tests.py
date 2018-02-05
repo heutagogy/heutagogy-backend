@@ -1267,13 +1267,49 @@ class StatsTestCase(HeutagogyTestCase):
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
         res = self.add_bookmark()
         self.assertEqual(HTTPStatus.CREATED, res.status_code)
-        res = self.add_bookmark()
-        self.assertEqual(HTTPStatus.CREATED, res.status_code)
 
         res = self.app.get('/api/v1/stats')
 
         self.assertEqual(HTTPStatus.OK, res.status_code)
         self.assertEqual(2, get_json(res)['total_read_7days'])
+
+    @multiple_users
+    def test_personal_stats(self):
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': datetime.now().isoformat(),
+        }, user=self.user1)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': (datetime.now() - timedelta(days=7)).isoformat(),
+        }, user=self.user1)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': (datetime.now() - timedelta(days=3)).isoformat(),
+        }, user=self.user2)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': (datetime.now() - timedelta(days=700)).isoformat(),
+        }, user=self.user1)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res1 = self.app.get('/api/v1/stats', headers=[self.user1])
+        res2 = self.app.get('/api/v1/stats', headers=[self.user2])
+
+        self.assertEqual(HTTPStatus.OK, res1.status_code)
+        self.assertEqual(HTTPStatus.OK, res2.status_code)
+
+        self.assertEqual(3, get_json(res1)['user_read'])
+        self.assertEqual(1, get_json(res2)['user_read'])
+
+        self.assertEqual(1, get_json(res1)['user_read_today'])
+        self.assertEqual(0, get_json(res2)['user_read_today'])
+
+        self.assertEqual(2, get_json(res1)['user_read_year'])
+        self.assertEqual(1, get_json(res2)['user_read_year'])
 
 
 if __name__ == '__main__':

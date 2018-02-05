@@ -336,10 +336,31 @@ class Stats(Resource):
                                    .filter(db.Bookmark.read > week_ago) \
                                    .count()
 
-        return {
+        stats = {
             'total_read': total_read,
             'total_read_7days': read_in_7days,
         }
+
+        if current_user.is_authenticated:
+            stats['user_read_today'] = \
+                db.Bookmark.query \
+                           .filter(db.Bookmark.user == current_user.id,
+                                   db.Bookmark.read >= datetime.date.today()) \
+                           .count()
+
+            year_start = datetime.date.today().replace(month=1, day=1)
+            stats['user_read_year'] = \
+                db.Bookmark.query \
+                           .filter(db.Bookmark.user == current_user.id,
+                                   db.Bookmark.read >= year_start) \
+                           .count()
+
+            stats['user_read'] = \
+                db.Bookmark.query \
+                           .filter(db.Bookmark.user == current_user.id) \
+                           .count()
+
+        return stats
 
 
 api.add_resource(Bookmarks,       '/api/v1/bookmarks')
