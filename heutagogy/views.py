@@ -325,9 +325,27 @@ class Notes(Resource):
         return (), HTTPStatus.NO_CONTENT
 
 
+class Stats(Resource):
+    def get(self):
+        total_read = db.Bookmark.query \
+                                .filter(db.Bookmark.read != None) \
+                                .count() # noqa
+
+        week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
+        read_in_7days = db.Bookmark.query \
+                                   .filter(db.Bookmark.read > week_ago) \
+                                   .count()
+
+        return {
+            'total_read': total_read,
+            'total_read_7days': read_in_7days,
+        }
+
+
 api.add_resource(Bookmarks,       '/api/v1/bookmarks')
 api.add_resource(Bookmark,        '/api/v1/bookmarks/<int:id>')
 api.add_resource(BookmarkContent, '/api/v1/bookmarks/<int:id>/content')
 api.add_resource(BookmarkNotes,   '/api/v1/bookmarks/<int:id>/notes')
 api.add_resource(Tags,            '/api/v1/tags')
 api.add_resource(Notes,           '/api/v1/notes/<int:id>')
+api.add_resource(Stats,           '/api/v1/stats')
