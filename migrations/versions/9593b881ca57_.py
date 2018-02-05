@@ -1,4 +1,4 @@
-"""empty message
+"""Add bookmark content columns
 
 Revision ID: 9593b881ca57
 Revises: 797321279ea1

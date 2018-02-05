@@ -1,4 +1,4 @@
-"""empty message
+"""Add google_id
 
 Revision ID: efd0d6a3c6d7
 Revises: 3ad0506db184
