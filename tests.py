@@ -8,6 +8,7 @@ import json
 import urllib.parse
 from urllib.parse import urlencode
 import link_header as lh
+from datetime import datetime, timedelta
 
 
 def get_json(response):
@@ -117,6 +118,8 @@ class HeutagogyTestCase(unittest.TestCase):
             'api/v1/bookmarks/{}'.format(bookmark_id),
             headers=[user])
 
+
+class ApiTestCase(HeutagogyTestCase):
     @single_user
     def test_post_bookmark(self):
         res = self.app.post(
@@ -1179,6 +1182,134 @@ class HeutagogyTestCase(unittest.TestCase):
             headers=[self.user1])
 
         self.assertEqual(HTTPStatus.BAD_REQUEST, res.status_code)
+
+
+class StatsTestCase(HeutagogyTestCase):
+    @single_user
+    def test_response_is_ok(self):
+        res = self.app.get('/api/v1/stats')
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+
+    @single_user
+    def test_initial_stats_is_zero(self):
+        res = self.app.get('/api/v1/stats')
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertEqual(0, get_json(res)['total_read'])
+        self.assertEqual(0, get_json(res)['total_read_7days'])
+
+    @single_user
+    def test_unread_bookmarks(self):
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.app.get('/api/v1/stats')
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertEqual(0, get_json(res)['total_read'])
+
+    @single_user
+    def test_read_bookmarks(self):
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': datetime.now().isoformat(),
+        })
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.app.get('/api/v1/stats')
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertEqual(1, get_json(res)['total_read'])
+
+    @multiple_users
+    def test_multiuser(self):
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': datetime.now().isoformat(),
+        }, user=self.user1)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': datetime.now().isoformat(),
+        }, user=self.user2)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.app.get('/api/v1/stats')
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertEqual(2, get_json(res)['total_read'])
+
+    @single_user
+    def test_read_in_7days(self):
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': datetime.now().isoformat(),
+        })
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': (datetime.now() - timedelta(days=3)).isoformat(),
+        })
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': (datetime.now() - timedelta(days=7)).isoformat(),
+        })
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark()
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res = self.app.get('/api/v1/stats')
+
+        self.assertEqual(HTTPStatus.OK, res.status_code)
+        self.assertEqual(2, get_json(res)['total_read_7days'])
+
+    @multiple_users
+    def test_personal_stats(self):
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': datetime.now().isoformat(),
+        }, user=self.user1)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': (datetime.now() - timedelta(days=7)).isoformat(),
+        }, user=self.user1)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': (datetime.now() - timedelta(days=3)).isoformat(),
+        }, user=self.user2)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+            'read': (datetime.now() - timedelta(days=700)).isoformat(),
+        }, user=self.user1)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res1 = self.app.get('/api/v1/stats', headers=[self.user1])
+        res2 = self.app.get('/api/v1/stats', headers=[self.user2])
+
+        self.assertEqual(HTTPStatus.OK, res1.status_code)
+        self.assertEqual(HTTPStatus.OK, res2.status_code)
+
+        self.assertEqual(3, get_json(res1)['user_read'])
+        self.assertEqual(1, get_json(res2)['user_read'])
+
+        self.assertEqual(1, get_json(res1)['user_read_today'])
+        self.assertEqual(0, get_json(res2)['user_read_today'])
+
+        self.assertEqual(2, get_json(res1)['user_read_year'])
+        self.assertEqual(1, get_json(res2)['user_read_year'])
 
 
 if __name__ == '__main__':

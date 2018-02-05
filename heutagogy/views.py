@@ -325,9 +325,48 @@ class Notes(Resource):
         return (), HTTPStatus.NO_CONTENT
 
 
+class Stats(Resource):
+    def get(self):
+        total_read = db.Bookmark.query \
+                                .filter(db.Bookmark.read != None) \
+                                .count() # noqa
+
+        week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
+        read_in_7days = db.Bookmark.query \
+                                   .filter(db.Bookmark.read > week_ago) \
+                                   .count()
+
+        stats = {
+            'total_read': total_read,
+            'total_read_7days': read_in_7days,
+        }
+
+        if current_user.is_authenticated:
+            stats['user_read_today'] = \
+                db.Bookmark.query \
+                           .filter(db.Bookmark.user == current_user.id,
+                                   db.Bookmark.read >= datetime.date.today()) \
+                           .count()
+
+            year_start = datetime.date.today().replace(month=1, day=1)
+            stats['user_read_year'] = \
+                db.Bookmark.query \
+                           .filter(db.Bookmark.user == current_user.id,
+                                   db.Bookmark.read >= year_start) \
+                           .count()
+
+            stats['user_read'] = \
+                db.Bookmark.query \
+                           .filter(db.Bookmark.user == current_user.id) \
+                           .count()
+
+        return stats
+
+
 api.add_resource(Bookmarks,       '/api/v1/bookmarks')
 api.add_resource(Bookmark,        '/api/v1/bookmarks/<int:id>')
 api.add_resource(BookmarkContent, '/api/v1/bookmarks/<int:id>/content')
 api.add_resource(BookmarkNotes,   '/api/v1/bookmarks/<int:id>/notes')
 api.add_resource(Tags,            '/api/v1/tags')
 api.add_resource(Notes,           '/api/v1/notes/<int:id>')
+api.add_resource(Stats,           '/api/v1/stats')
