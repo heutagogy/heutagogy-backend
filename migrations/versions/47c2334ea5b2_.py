@@ -1,4 +1,4 @@
-"""
+"""Add bookmark meta field
 
 Revision ID: 47c2334ea5b2
 Revises: efd0d6a3c6d7
