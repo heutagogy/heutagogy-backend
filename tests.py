@@ -1311,6 +1311,40 @@ class StatsTestCase(HeutagogyTestCase):
         self.assertEqual(2, get_json(res1)['user_read_year'])
         self.assertEqual(1, get_json(res2)['user_read_year'])
 
+    @multiple_users
+    def test_user_stats_count_only_read(self):
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+        }, user=self.user1)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+        }, user=self.user1)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+        }, user=self.user2)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+        res = self.add_bookmark({
+            'url': 'https://github.com',
+        }, user=self.user1)
+        self.assertEqual(HTTPStatus.CREATED, res.status_code)
+
+        res1 = self.app.get('/api/v1/stats', headers=[self.user1])
+        res2 = self.app.get('/api/v1/stats', headers=[self.user2])
+
+        self.assertEqual(HTTPStatus.OK, res1.status_code)
+        self.assertEqual(HTTPStatus.OK, res2.status_code)
+
+        self.assertEqual(0, get_json(res1)['user_read'])
+        self.assertEqual(0, get_json(res2)['user_read'])
+
+        self.assertEqual(0, get_json(res1)['user_read_today'])
+        self.assertEqual(0, get_json(res2)['user_read_today'])
+
+        self.assertEqual(0, get_json(res1)['user_read_year'])
+        self.assertEqual(0, get_json(res2)['user_read_year'])
+
 
 if __name__ == '__main__':
     unittest.main()
