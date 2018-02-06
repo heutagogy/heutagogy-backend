@@ -357,8 +357,9 @@ class Stats(Resource):
 
             stats['user_read'] = \
                 db.Bookmark.query \
-                           .filter(db.Bookmark.user == current_user.id) \
-                           .count()
+                           .filter(db.Bookmark.user == current_user.id,
+                                   db.Bookmark.read != None) \
+                           .count() # noqa
 
         return stats
 
