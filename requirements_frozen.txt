@@ -37,7 +37,7 @@ newspaper3k==0.1.9
 nltk==3.4.5
 packaging==16.8
 passlib==1.7.1
-Pillow==5.0.0
+Pillow==6.2.0
 psycopg2==2.7.3.2
 pyasn1==0.4.2
 pyasn1-modules==0.2.1
